@@ -23,7 +23,15 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 	
 	public sealed class BooleanUtility
 	{
-		public static object Not(object tempValue)
+        public static bool? UnboxBoolean(object tempValue)
+        {
+            if (tempValue == null)
+                return new Nullable<bool>();
+            else
+                return new Nullable<bool>((bool)tempValue);
+        }
+
+		public static bool? Not(bool? tempValue)
 		{
 			#if NILPROPOGATION
 			if (tempValue == null)
@@ -33,7 +41,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return !((bool)tempValue);
 		}
 
-		public static object And(object leftValue, object rightValue)
+		public static bool? And(bool? leftValue, bool? rightValue)
 		{
 			#if NILPROPOGATION
 			if ((leftValue == null))
@@ -58,7 +66,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 		}
 		
-		public static object Or(object leftValue, object rightValue)
+		public static bool? Or(bool? leftValue, bool? rightValue)
 		{
 			#if NILPROPOGATION
 			if (leftValue == null)
@@ -82,7 +90,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 		}
 
-		public static object Xor(object leftValue, object rightValue)
+		public static bool? Xor(bool? leftValue, bool? rightValue)
 		{
 			return 
 				Or
@@ -106,8 +114,13 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
     {
 		public override object InternalExecute(Program program, object argument)
 		{
-			return BooleanUtility.Not(argument);
+			return BooleanUtility.Not(BooleanUtility.UnboxBoolean(argument));
 		}
+
+        public static bool? InternalExecute(Program program, bool? argument)
+        {
+            return BooleanUtility.Not(argument);
+        }
     }
 
     /// <remarks> 
@@ -118,8 +131,13 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
-			return BooleanUtility.And(argument1, argument2);
+			return BooleanUtility.And(BooleanUtility.UnboxBoolean(argument1), BooleanUtility.UnboxBoolean(argument2));
 		}
+
+        public static bool? InternalExecute(Program program, bool? argument1, bool? argument2)
+        {
+            return BooleanUtility.And(argument1, argument2);
+        }
     }
 
     /// <remarks>operator System.iOr(System.Boolean, System.Boolean) : System.Boolean</remarks>
@@ -127,8 +145,13 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
-			return BooleanUtility.Or(argument1, argument2);
+			return BooleanUtility.Or(BooleanUtility.UnboxBoolean(argument1), BooleanUtility.UnboxBoolean(argument2));
 		}
+
+        public static bool? InternalExecute(Program program, bool? argument1, bool? argument2)
+        {
+            return BooleanUtility.Or(argument1, argument2);
+        }
     }
 
     /// <remarks>operator System.iXor(System.Boolean, System.Boolean) : System.Boolean</remarks>
@@ -136,7 +159,12 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
-			return BooleanUtility.Xor(argument1, argument2);
+			return BooleanUtility.Xor(BooleanUtility.UnboxBoolean(argument1), BooleanUtility.UnboxBoolean(argument2));
 		}
+
+        public static bool? InternalExecute(Program program, bool? argument1, bool? argument2)
+        {
+            return BooleanUtility.Xor(argument1, argument2);
+        }
     }
 }

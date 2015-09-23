@@ -694,8 +694,12 @@ namespace Alphora.Dataphor.DAE.Compiling
 			if (!plan.Messages.HasErrors)
 			{
 				long startSubTicks = TimingUtility.CurrentTicks;
-				//node = ChunkNode(plan, node);
+                //node = ChunkNode(plan, node);
+                if (plan.ShouldEmitIL)
+                    node.StartEmitIL(plan);
 				node = OptimizeNode(plan, node);
+                if (plan.ShouldEmitIL)
+                    node.FinishEmitIL(plan);
 				plan.Statistics.OptimizeTime = new TimeSpan((long)((((double)(TimingUtility.CurrentTicks - startSubTicks)) / TimingUtility.TicksPerSecond) * TimeSpan.TicksPerSecond));
 				//startSubTicks = TimingUtility.CurrentTicks;
 				//node = Bind(plan, node);
@@ -766,11 +770,22 @@ namespace Alphora.Dataphor.DAE.Compiling
 					// Determine access paths
 					#if USEVISIT
 					planNode = BindingTraversal(plan, planNode, new DetermineAccessPathVisitor());
-					#else
+#else
 					BindingTraversal(plan, planNode, new DetermineAccessPathVisitor());
-					#endif
-				}
-			}
+#endif
+
+                    // determine if it should be compiled to IL
+                    try
+                    {
+                        if (plan.ShouldEmitIL)
+                            planNode.EmitIL(plan);
+                    }
+                    catch (Exception exception)
+                    {
+                        plan.Messages.Add(new CompilerException(CompilerException.Codes.NonFatalErrors, CompilerErrorLevel.Warning, exception));
+                    }
+                }
+            }
 			catch (Exception exception)
 			{
 				plan.Messages.Add(exception);
@@ -784,26 +799,7 @@ namespace Alphora.Dataphor.DAE.Compiling
 		//	// This method is here for consistency with the Bind phase method, and for future expansion.
 		//	return OptimizeNode(plan, planNode);
 		//}
-		
-		//private static PlanNode OptimizeNode(Plan plan, PlanNode planNode)
-		//{
-		//    try
-		//    {
-		//        if (plan.ShouldEmitIL)
-		//            planNode.EmitIL(plan, false);
-
-		//        if (!plan.IsEngine)
-		//        {
-		//            planNode = BindingTraversal(plan, planNode, new DetermineAccessPathVisitor());
-		//        }
-		//    }
-		//    catch (Exception exception)
-		//    {
-		//        plan.Messages.Add(exception);
-		//    }
-
-		//    return planNode;
-		//}
+	
 		
 		//private static PlanNode Bind(Plan plan, PlanNode planNode)
 		//{

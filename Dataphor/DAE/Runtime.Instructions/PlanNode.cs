@@ -484,12 +484,51 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-		#endregion
+        #endregion
 
-		#region Statement Emission
+        #region IL Emission
+        public virtual void EmitIL(Plan plan)
+        {
+        }
+        public void StartEmitIL(Plan plan)
+        {
+            var gen = plan.ILGenerator;
+        }
+        private Func<Program, object> _ilMethod;
+        public Func<Program,object> ILMethod
+        {
+            get { return _ilMethod; }
+        }
+        public void FinishEmitIL(Plan plan)
+        {
+            try {
+                // emit the epilogue
+                var retType = this.ILNativeType();
+                if (retType.IsValueType)
+                    plan.ILGenerator.Emit(OpCodes.Box, this.ILNativeType());
+                else
+                    plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
+                plan.ILGenerator.Emit(OpCodes.Ret);
 
-		// Statement
-		public virtual Statement EmitStatement(EmitMode mode)
+                // try to create a dynamic method
+                _ilMethod = plan.CreateDynamicMethod();
+            }
+            catch (Exception e)
+            {
+                plan.Messages.Add(new CompilerException(CompilerException.Codes.NonFatalErrors, CompilerErrorLevel.Warning, e));
+                _ilMethod = null;
+            }
+        }
+        public virtual Type ILNativeType()
+        {
+            throw new CompilerException(CompilerException.Codes.CompilerMessage, "IL native type unsupported!");
+        }
+        #endregion
+
+        #region Statement Emission
+
+        // Statement
+        public virtual Statement EmitStatement(EmitMode mode)
 		{
 			throw new RuntimeException(RuntimeException.Codes.StatementNotSupported, ToString());
 		}

@@ -217,8 +217,39 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				break;
 			}
 		}
-		
-		public override string Category
+
+#region IL Emission
+        public override void EmitIL(Plan plan)
+        {
+            var types = new Type[NodeCount+1];
+            types[0] = typeof(Program);
+            for (int i = 0; i < NodeCount; i++)
+                types[i+1] = Nodes[i].ILNativeType();
+            // push the Program argument on stack
+            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+            for (int i = 0; i < NodeCount; i++)
+                Nodes[i].EmitIL(plan);
+            var mth = this.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, types, null);
+            if (mth == null)
+                throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
+
+            plan.ILGenerator.Emit(OpCodes.Call, mth);
+        }
+
+        public override Type ILNativeType()
+        {
+            var types = new Type[NodeCount + 1];
+            types[0] = typeof(Program);
+            for (int i = 0; i < NodeCount; i++)
+                types[i + 1] = Nodes[i].ILNativeType();
+            var mth = this.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, types, null);
+            if (mth == null)
+                throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
+            return mth.ReturnType;
+        }
+        #endregion
+
+        public override string Category
 		{
 			get { return "Instruction"; }
 		}
@@ -398,7 +429,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 	{
 		public abstract object InternalExecute(Program program, object[] arguments);
 
-		public override object InternalExecute(Program program)
+        public override object InternalExecute(Program program)
 		{
 			object[] arguments = new object[NodeCount];
 			for (int index = 0; index < arguments.Length; index++)
