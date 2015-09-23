@@ -353,7 +353,10 @@ namespace Alphora.Dataphor.DAE.Runtime
 			try
 			{
 				long startTicks = TimingUtility.CurrentTicks;
-				result = _code.Execute(this);
+                if (_code.ILMethod != null)
+                    result = _code.ILMethod(this);
+                else
+                    result = _code.Execute(this);
 				_statistics.ExecuteTime = TimingUtility.TimeSpanFromTicks(startTicks);
 			}
 			finally

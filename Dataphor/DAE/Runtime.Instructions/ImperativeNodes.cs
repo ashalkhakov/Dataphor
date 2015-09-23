@@ -963,9 +963,66 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		{
 			return _value;		 
 		}
-		
-		// EmitStatement
-		public override Statement EmitStatement(EmitMode mode)
+
+        public override Type ILNativeType()
+        {
+            switch (DataType.Name)
+            {
+                case "System.Boolean":
+                    return typeof(Nullable<bool>);
+                case "System.Byte":
+                    return typeof(Nullable<byte>);
+                case "System.String":
+                    return typeof(string);
+                case "System.Integer":
+                    return typeof(Nullable<int>);
+                case "System.Long":
+                    return typeof(Nullable<long>);
+                default:
+                    break;
+            }
+            throw new CompilerException(CompilerException.Codes.CompilerMessage, "IL Native type unsupported");
+        }
+
+        public override void EmitIL(Plan plan)
+        {
+            Type hostType = null;
+            bool makeNullable = true;
+            if (DataType == plan.Catalog.DataTypes.SystemBoolean)
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
+                hostType = typeof(bool);
+            }
+            else if (DataType == plan.Catalog.DataTypes.SystemByte)
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
+                hostType = typeof(byte);
+            }
+            else if (DataType == plan.Catalog.DataTypes.SystemString)
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldstr, Convert.ToString(_value));
+                hostType = typeof(string);
+                makeNullable = false;
+            }
+            else if (DataType == plan.Catalog.DataTypes.SystemInteger)
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
+                hostType = typeof(int);
+            }
+            else if (DataType == plan.Catalog.DataTypes.SystemLong) {
+                plan.ILGenerator.Emit(OpCodes.Ldc_I8, Convert.ToInt64(_value));
+                hostType = typeof(long);
+            }
+            else
+                // unsupported scalar type
+                throw new CompilerException(CompilerException.Codes.InvalidElementType, DataType.Name);
+
+            if (makeNullable)
+                plan.ILGenerator.Emit(OpCodes.Newobj, typeof(Nullable<>).MakeGenericType(hostType).GetConstructor(new Type[] { hostType }));
+        }
+
+        // EmitStatement
+        public override Statement EmitStatement(EmitMode mode)
 		{
 			if (_value == null)
 				return new ValueExpression(null, TokenType.Nil);

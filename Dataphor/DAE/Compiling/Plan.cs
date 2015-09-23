@@ -868,5 +868,30 @@ namespace Alphora.Dataphor.DAE.Compiling
 		{
 			return Catalog.ClassLoader.CreateObject(CatalogDeviceSession, classDefinition, actualParameters);
 		}
-	}
+
+        #region IL Emission
+        private System.Reflection.Emit.DynamicMethod _dynamicMethod = null;
+        public System.Reflection.Emit.ILGenerator ILGenerator
+        {
+            get
+            {
+                if (_dynamicMethod == null)
+                    _dynamicMethod = new System.Reflection.Emit.DynamicMethod(
+                        "dynmth_" + Guid.NewGuid().ToString().Replace("-", "_"),
+                        System.Reflection.MethodAttributes.Public | System.Reflection.MethodAttributes.Static,
+                        System.Reflection.CallingConventions.Standard,
+                        typeof(object),
+                        new Type[] { typeof(Program) },
+                        typeof(Plan).Module,
+                        false
+                        );
+                return _dynamicMethod.GetILGenerator();
+            }
+        }
+        public Func<Program,object> CreateDynamicMethod()
+        {
+            return (Func<Program, object>)_dynamicMethod.CreateDelegate(typeof(Func<Program, object>));
+        }
+        #endregion
+    }
 }
