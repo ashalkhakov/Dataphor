@@ -63,7 +63,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return argument1.ToString();
 		}
 
-        public static string InternalExecute(Program program, string argument1)
+        public static string InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -87,7 +87,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (bool)argument1 ? Keywords.True : Keywords.False;
 		}
 
-        public static string InternalExecute(Program program, bool? argument1)
+        public static string InternalExecute(bool? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -111,7 +111,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToBoolean((string)argument1);
 		}
 
-        public static bool? InternalExecute(Program program, string argument1)
+        public static bool? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -135,7 +135,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((byte)argument1).ToString();
 		}
 
-        public static string InternalExecute(Program program, byte? argument1)
+        public static string InternalExecute(byte? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -159,7 +159,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToByte((string)argument1);
 		}
 
-        public byte? InternalExecute(Program program, string argument1)
+        public byte? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -233,7 +233,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((short)argument1).ToString();
 		}
 
-        public static string InternalExecute(Program program, short? argument1)
+        public static string InternalExecute(short? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -257,7 +257,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToInt16((string)argument1);
 		}
 
-        public static short? InternalExecute(Program program, string argument1)
+        public static short? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -331,7 +331,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((int)argument1).ToString();
 		}
 
-        public static string InternalExecute(Program program, int? argument1)
+        public static string InternalExecute(int? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -355,7 +355,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToInt32((string)argument1);
 		}
 
-        public static int? InternalExecute(Program program, string argument1)
+        public static int? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -429,7 +429,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((long)argument1).ToString();
 		}
 
-        public static string InternalExecute(Program program, long? argument1)
+        public static string InternalExecute(long? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -453,7 +453,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToInt64((string)argument1);
 		}
 
-        public static long? InternalExecute(Program program, string argument1)
+        public static long? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -527,7 +527,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((Guid)argument1).ToString();
 		}
 
-        public static string InternalExecute(Program program, Guid? argument1)
+        public static string InternalExecute(Guid? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -551,7 +551,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return new Guid((string)argument1);
 		}
 
-        public static Guid? InternalExecute(Program program, string argument1)
+        public static Guid? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -575,7 +575,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (byte)argument1 == 0 ? false : true;
 		}
 
-        public static bool? InternalExecute(Program program, byte? argument1)
+        public static bool? InternalExecute(byte? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -599,7 +599,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (byte)((bool)argument1 ? 1 : 0);
 		}
 
-        public static byte? InternalExecute(Program program, bool? argument1)
+        public static byte? InternalExecute(bool? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -673,7 +673,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (short)argument1 == 0 ? false : true;
 		}
 
-        public static bool? InternalExecute(Program program, short? argument1)
+        public static bool? InternalExecute(short? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -697,7 +697,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (short)((bool)argument1 ? 1 : 0);
 		}
 
-        public static short? InternalExecute(Program program, bool? argument1)
+        public static short? InternalExecute(bool? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -771,7 +771,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (int)argument1 == 0 ? false : true;
 		}
 
-        public static bool? InternalExecute(Program program, int? argument1)
+        public static bool? InternalExecute(int? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -795,7 +795,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (bool)argument1 ? 1 : 0;
 		}
 
-        public static int? InternalExecute(Program program, bool? argument1)
+        public static int? InternalExecute(bool? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -869,7 +869,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)argument1 == 0 ? false : true;
 		}
 
-        public static bool? InternalExecute(Program program, long? argument1)
+        public static bool? InternalExecute(long? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -893,7 +893,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)((bool)argument1 ? 1 : 0);
 		}
 
-        public static long? InternalExecute(Program program, bool? argument1)
+        public static long? InternalExecute(bool? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1017,7 +1017,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (short)(byte)argument1;
 		}
 
-        public static short? InternalExecute(Program program, byte? argument1)
+        public static short? InternalExecute(byte? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1046,7 +1046,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}			
 		}
 
-        public static byte? InternalExecute(Program program, short? argument1)
+        public static byte? InternalExecute(short? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1125,7 +1125,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (int)(byte)argument1;
 		}
 
-        public static int? InternalExecute(Program program, byte? argument1)
+        public static int? InternalExecute(byte? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1154,7 +1154,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static byte? InternalExecute(Program program, int? argument1)
+        public static byte? InternalExecute(int? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1233,7 +1233,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)(byte)argument1;
 		}
 
-        public static long? InternalExecute(Program program, byte? argument1)
+        public static long? InternalExecute(byte? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1262,7 +1262,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static byte? InternalExecute(Program program, long? argument1)
+        public static byte? InternalExecute(long? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1681,7 +1681,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (int)(short)argument1;
 		}
 
-        public static int? InternalExecute(Program program, short? argument1)
+        public static int? InternalExecute(short? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1710,7 +1710,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static short? InternalExecute(Program program, int? argument1)
+        public static short? InternalExecute(int? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1789,7 +1789,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)(short)argument1;
 		}
 
-        public static long? InternalExecute(Program program, short? argument1)
+        public static long? InternalExecute(short? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -1818,7 +1818,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static short? InternalExecute(Program program, long? argument1)
+        public static short? InternalExecute(long? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2137,7 +2137,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)(int)argument1;
 		}
 
-        public static long? InternalExecute(Program program, int? argument1)
+        public static long? InternalExecute(int? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2166,7 +2166,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static int? InternalExecute(Program program, long? argument1)
+        public static int? InternalExecute(long? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2447,7 +2447,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((decimal)argument1).ToString("0.#############################");
 		}
 
-        public static string InternalExecute(Program program, decimal? argument1)
+        public static string InternalExecute(decimal? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2471,7 +2471,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return ((decimal)argument1).ToString("C");
 		}
 
-        public static string InternalExecute(Program program, decimal? argument1)
+        public static string InternalExecute(decimal? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2495,7 +2495,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToDecimal((string)argument1);
 		}
 
-        public static decimal? InternalExecute(Program program, string argument1)
+        public static decimal? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2519,7 +2519,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency);
 		}
 
-        public static decimal? InternalExecute(Program program, string argument1)
+        public static decimal? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2548,7 +2548,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static int? InternalExecute(Program program, decimal? argument1)
+        public static int? InternalExecute(decimal? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2577,7 +2577,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToDecimal((int)argument1);
 		}
 
-        public static decimal? InternalExecute(Program program, int? argument1)
+        public static decimal? InternalExecute(int? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2630,7 +2630,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1)
+        public static decimal? InternalExecute(decimal? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2709,7 +2709,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public static long? InternalExecute(Program program, decimal? argument1)
+        public static long? InternalExecute(decimal? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2738,7 +2738,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToDecimal((long)argument1);
 		}
 
-        public static decimal? InternalExecute(Program program, long? argument1)
+        public static decimal? InternalExecute(long? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2813,7 +2813,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return new TimeSpan(((DateTime)argument1).Ticks);
 		}
 
-        public static TimeSpan? InternalExecute(Program program, DateTime? argument1)
+        public static TimeSpan? InternalExecute(DateTime? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2837,7 +2837,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return new DateTime(((TimeSpan)argument1).Ticks);
 		}
 
-        public static DateTime? InternalExecute(Program program, TimeSpan? argument1)
+        public static DateTime? InternalExecute(TimeSpan? argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)

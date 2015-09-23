@@ -221,30 +221,48 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 #region IL Emission
         public override void EmitIL(Plan plan)
         {
-            var types = new Type[NodeCount+1];
-            types[0] = typeof(Program);
+            var types = new Type[NodeCount];
             for (int i = 0; i < NodeCount; i++)
-                types[i+1] = Nodes[i].ILNativeType();
-            // push the Program argument on stack
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            for (int i = 0; i < NodeCount; i++)
-                Nodes[i].EmitIL(plan);
+                types[i] = Nodes[i].ILNativeType();
             var mth = this.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, types, null);
             if (mth == null)
-                throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
+            {
+                // try the fallback
+                var newtypes = new Type[NodeCount + 1];
+                newtypes[0] = typeof(Program);
+                for (int i = 0; i < NodeCount; i++)
+                    newtypes[i + 1] = types[i];
+                mth = this.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, newtypes, null);
+                if (mth == null)
+                    throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
 
+                // push the Program argument on stack
+                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+            }
+
+            for (int i = 0; i < NodeCount; i++)
+                Nodes[i].EmitIL(plan);
             plan.ILGenerator.Emit(OpCodes.Call, mth);
         }
 
         public override Type ILNativeType()
         {
-            var types = new Type[NodeCount + 1];
-            types[0] = typeof(Program);
+            var types = new Type[NodeCount];
             for (int i = 0; i < NodeCount; i++)
-                types[i + 1] = Nodes[i].ILNativeType();
+                types[i] = Nodes[i].ILNativeType();
             var mth = this.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, types, null);
             if (mth == null)
+            {
+                // try the fallback
+                var newtypes = new Type[NodeCount + 1];
+                newtypes[0] = typeof(Program);
+                for (int i = 0; i < NodeCount; i++)
+                    newtypes[i + 1] = types[i];
+                mth = this.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, newtypes, null);
+            }
+            if (mth == null)
                 throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
+
             return mth.ReturnType;
         }
         #endregion

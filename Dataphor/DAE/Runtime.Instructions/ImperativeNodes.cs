@@ -961,7 +961,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		// Execute
 		public override object InternalExecute(Program program)
 		{
-			return _value;		 
+			return _value;
 		}
 
         public override Type ILNativeType()
@@ -978,6 +978,13 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                     return typeof(Nullable<int>);
                 case "System.Long":
                     return typeof(Nullable<long>);
+                case "System.Short":
+                    return typeof(Nullable<short>);
+                case "System.Decimal":
+                case "System.Money":
+                    return typeof(Nullable<decimal>);
+//                case "System.Generic":
+//                    return typeof(object);
                 default:
                     break;
             }
@@ -988,37 +995,100 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         {
             Type hostType = null;
             bool makeNullable = true;
+            /*
+            //            plan.Catalog.DataTypes.SystemDate
+            //plan.Catalog.DataTypes.SystemDateTime
+            //plan.Catalog.DataTypes.SystemDecimal
+            //plan.Catalog.DataTypes.SystemError
+            //plan.Catalog.DataTypes.SystemGraphic
+                plan.Catalog.DataTypes.SystemShort
+                plan.Catalog.DataTypes.SystemTime
+                plan.Catalog.DataTypes.SystemTimeSpan
+                */
             if (DataType == plan.Catalog.DataTypes.SystemBoolean)
             {
-                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
                 hostType = typeof(bool);
             }
             else if (DataType == plan.Catalog.DataTypes.SystemByte)
             {
-                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
                 hostType = typeof(byte);
             }
             else if (DataType == plan.Catalog.DataTypes.SystemString)
             {
-                plan.ILGenerator.Emit(OpCodes.Ldstr, Convert.ToString(_value));
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Ldstr, Convert.ToString(_value));
                 hostType = typeof(string);
-                makeNullable = false;
             }
             else if (DataType == plan.Catalog.DataTypes.SystemInteger)
             {
-                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(_value));
                 hostType = typeof(int);
             }
             else if (DataType == plan.Catalog.DataTypes.SystemLong) {
-                plan.ILGenerator.Emit(OpCodes.Ldc_I8, Convert.ToInt64(_value));
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Ldc_I8, Convert.ToInt64(_value));
                 hostType = typeof(long);
             }
+            else if (DataType == plan.Catalog.DataTypes.SystemShort)
+            {
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt16(_value));
+                hostType = typeof(short);
+            }
+            else if (DataType == plan.Catalog.DataTypes.SystemDecimal || DataType == plan.Catalog.DataTypes.SystemMoney)
+            {
+                if (_value != null)
+                {
+                    decimal dec = (decimal)_value;
+                    var bits = decimal.GetBits(dec);
+                    plan.ILGenerator.Emit(OpCodes.Ldc_I4, bits.Length);
+                    plan.ILGenerator.Emit(OpCodes.Newarr, typeof(int));
+
+                    var bitIndex = 0;
+                    foreach (var b in bits)
+                    {
+                        plan.ILGenerator.Emit(OpCodes.Dup);
+                        plan.ILGenerator.Emit(OpCodes.Ldc_I4, bitIndex);
+                        plan.ILGenerator.Emit(OpCodes.Ldc_I4, b);
+                        plan.ILGenerator.Emit(OpCodes.Stelem_I4);
+                        bitIndex++;
+                    }
+
+                    var ctor = typeof(decimal).GetConstructor(new Type[] { typeof(int[]) });
+                    plan.ILGenerator.Emit(OpCodes.Newobj, ctor);
+                }
+                hostType = typeof(decimal);
+            }
+            /*
+            else if (DataType == plan.Catalog.DataTypes.SystemGeneric)
+            {
+                if (_value != null)
+                {
+                    // FIXME: how to reconstruct an arbitrary object?
+                    throw new CompilerException(CompilerException.Codes.InvalidElementType, DataType.Name);
+                }
+                else
+                {
+                    hostType = typeof(object);
+                }
+                makeNullable = false;
+            }*/
             else
                 // unsupported scalar type
                 throw new CompilerException(CompilerException.Codes.InvalidElementType, DataType.Name);
 
             if (makeNullable)
-                plan.ILGenerator.Emit(OpCodes.Newobj, typeof(Nullable<>).MakeGenericType(hostType).GetConstructor(new Type[] { hostType }));
+            {
+                if (_value != null)
+                    plan.ILGenerator.Emit(OpCodes.Newobj, typeof(Nullable<>).MakeGenericType(hostType).GetConstructor(new Type[] { hostType }));
+                else
+                    plan.ILGenerator.Emit(OpCodes.Newobj, typeof(Nullable<>).MakeGenericType(hostType).GetConstructor(Type.EmptyTypes));
+            }
         }
 
         // EmitStatement

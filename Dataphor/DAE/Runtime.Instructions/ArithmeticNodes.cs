@@ -37,7 +37,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			
 		}
 
-        public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument) {
+        public static sbyte? InternalExecute(sbyte? AArgument) {
 #if NILPROPOGATION
 			if (AArgument == null)
 				return null;
@@ -119,7 +119,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (short)-(short)argument; // Another cast is required because the result of negating a short is an int.
 		}
 
-        public static short? InternalExecute(Program program, short? argument)
+        public static short? InternalExecute(short? argument)
         {
 #if NILPROPOGATION
             if (argument == null)
@@ -143,7 +143,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return -(int)argument;
 		}
 
-        public static int? InternalExecute(Program program, int? argument)
+        public static int? InternalExecute(int? argument)
         {
 #if NILPROPOGATION
             if (argument == null)
@@ -167,7 +167,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return -(long)argument;
 		}
 
-        public static long? InternalExecute(Program program, long? argument)
+        public static long? InternalExecute(long? argument)
         {
 #if NILPROPOGATION
             if (argument == null)
@@ -192,7 +192,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return -(double)AArgument;
 		}
 
-		public static double? InternalExecute(Program AProgram, double? AArgument)
+		public static double? InternalExecute(double? AArgument)
 		{
 #if NILPROPOGATION
 			if (AArgument == null)
@@ -217,7 +217,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return -(decimal)argument;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument)
+        public static decimal? InternalExecute(decimal? argument)
         {
 #if NILPROPOGATION
             if (argument == null)
@@ -246,7 +246,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static byte? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static byte? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -281,7 +281,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument1, sbyte? AArgument2)
+		public static sbyte? InternalExecute(sbyte? AArgument1, sbyte? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -316,7 +316,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static short? InternalExecute(Program program, short? argument1, short? argument2)
+        public static short? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -351,7 +351,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ushort? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+		public static ushort? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -386,7 +386,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static int? InternalExecute(Program program, int? argument1, int? argument2)
+        public static int? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -421,7 +421,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static uint? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+		public static uint? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -456,7 +456,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static long? InternalExecute(Program program, long? argument1, long? argument2)
+        public static long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -491,7 +491,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ulong? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+		public static ulong? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -527,7 +527,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static double? InternalExecute(Program AProgram, double? AArgument1, double? AArgument2)
+		public static double? InternalExecute(double? AArgument1, double? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -562,7 +562,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -599,7 +599,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static byte? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static byte? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -637,7 +637,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-    	public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument1, sbyte? AArgument2)
+    	public static sbyte? InternalExecute(sbyte? AArgument1, sbyte? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -675,7 +675,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static short? InternalExecute(Program program, short? argument1, short? argument2)
+        public static short? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -713,7 +713,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-    	public static ushort? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+    	public static ushort? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -748,7 +748,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static int? InternalExecute(Program program, int? argument1, int? argument2)
+        public static int? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -783,7 +783,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					)
 		}
 
-    	public static uint? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+    	public static uint? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -818,7 +818,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static long? InternalExecute(Program program, long? argument1, long? argument2)
+        public static long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -853,7 +853,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-    	public static ulong? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+    	public static ulong? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -888,7 +888,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-    	public static double? InternalExecute(Program AProgram, double? AArgument1, double? AArgument2)
+    	public static double? InternalExecute(double? AArgument1, double? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -917,7 +917,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 * (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -941,7 +941,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 * (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -965,7 +965,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 * (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1041,7 +1041,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static decimal? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static decimal? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1077,7 +1077,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static byte? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static byte? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1114,7 +1114,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static decimal? InternalExecute(Program AProgram, decimal? AArgument1, decimal? AArgument2)
+		public static decimal? InternalExecute(decimal? AArgument1, decimal? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1147,7 +1147,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument1, sbyte? AArgument2)
+		public static sbyte? InternalExecute(sbyte? AArgument1, sbyte? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1181,7 +1181,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static decimal? InternalExecute(Program program, short? argument1, short? argument2)
+        public static decimal? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1217,7 +1217,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static short? InternalExecute(Program program, short? argument1, short? argument2)
+        public static short? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1254,7 +1254,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-    	public static decimal? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+    	public static decimal? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1289,7 +1289,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ushort? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+		public static ushort? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1319,7 +1319,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)(int)argument1 / (int)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, int? argument1, int? argument2)
+        public static decimal? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1348,7 +1348,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static int? InternalExecute(Program program, int? argument1, int? argument2)
+        public static int? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1382,7 +1382,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static decimal? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+		public static decimal? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1414,7 +1414,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static uint? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+		public static uint? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1443,7 +1443,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)(long)argument1 / (decimal)(long)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, long? argument1, long? argument2)
+        public static decimal? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1472,7 +1472,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static long? InternalExecute(Program program, long? argument1, long? argument2)
+        public static long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1506,7 +1506,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static decimal? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+		public static decimal? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1538,7 +1538,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ulong? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+		public static ulong? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1572,7 +1572,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-    	public static double? InternalExecute(Program AProgram, double? AArgument1, double? AArgument2)
+    	public static double? InternalExecute(double? AArgument1, double? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1601,7 +1601,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 / (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1636,7 +1636,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1671,7 +1671,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 / (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1695,7 +1695,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 / (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1719,7 +1719,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 / (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1743,7 +1743,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 / (int)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, int? argument2)
+        public static decimal? InternalExecute(decimal? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1767,7 +1767,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (int)argument1 / (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, int? argument1, decimal? argument2)
+        public static decimal? InternalExecute(int? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1796,7 +1796,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static byte? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static byte? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1831,7 +1831,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument1, sbyte? AArgument2)
+		public static sbyte? InternalExecute(sbyte? AArgument1, sbyte? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1866,7 +1866,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static short? InternalExecute(Program program, short? argument1, short? argument2)
+        public static short? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1901,7 +1901,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ushort? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+		public static ushort? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1931,7 +1931,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (int)argument1 % (int)argument2;
 		}
 
-        public static int? InternalExecute(Program program, int? argument1, int? argument2)
+        public static int? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -1956,7 +1956,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (uint)AArgument1 % (uint)AArgument2;
 		}
 
-		public static uint? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+		public static uint? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -1981,7 +1981,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)argument1 % (long)argument2;
 		}
 
-        public long? InternalExecute(Program program, long? argument1, long? argument2)
+        public long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2006,7 +2006,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (ulong)AArgument1() % (ulong)AArgument2;
 		}
 
-		public static ulong? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+		public static ulong? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2032,7 +2032,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (double)AArgument1() % (double)AArgument2;
 		}
 
-		public static double? InternalExecute(Program AProgram, double? AArgument1, double? AArgument2)
+		public static double? InternalExecute(double? AArgument1, double? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2057,7 +2057,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 % (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2081,7 +2081,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (string)argument1 + (string)argument2;
 		}
 
-        public static string InternalExecute(Program program, string argument1, string argument2)
+        public static string InternalExecute(string argument1, string argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2113,7 +2113,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static byte? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static byte? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2151,7 +2151,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument1, sbyte? AArgument2)
+		public static sbyte? InternalExecute(sbyte? AArgument1, sbyte? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2189,7 +2189,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static short? InternalExecute(Program program, short? argument1, short? argument2)
+        public static short? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2227,7 +2227,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ushort? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+		public static ushort? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2257,7 +2257,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return checked((int)argument1 + (int)argument2);
 		}
 
-        public static int? InternalExecute(Program program, int? argument1, int? argument2)
+        public static int? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2286,7 +2286,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static uint? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+		public static uint? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2320,7 +2320,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static long? InternalExecute(Program program, long? argument1, long? argument2)
+        public static long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2354,7 +2354,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ulong? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+		public static ulong? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2388,7 +2388,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static double? InternalExecute(Program AProgram, double? AArgument1, double? AArgument2)
+		public static double? InternalExecute(double? AArgument1, double? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2417,7 +2417,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 + (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2441,7 +2441,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 + (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2473,7 +2473,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static byte? InternalExecute(Program program, byte? argument1, byte? argument2)
+        public static byte? InternalExecute(byte? argument1, byte? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2511,7 +2511,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static sbyte? InternalExecute(Program AProgram, sbyte? AArgument1, sbyte? AArgument2)
+		public static sbyte? InternalExecute(sbyte? AArgument1, sbyte? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2549,7 +2549,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static short? InternalExecute(Program program, short? argument1, short? argument2)
+        public static short? InternalExecute(short? argument1, short? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2587,7 +2587,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ushort? InternalExecute(Program AProgram, ushort? AArgument1, ushort? AArgument2)
+		public static ushort? InternalExecute(ushort? AArgument1, ushort? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2622,7 +2622,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static int? InternalExecute(Program program, int? argument1, int? argument2)
+        public static int? InternalExecute(int? argument1, int? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2656,7 +2656,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static uint? InternalExecute(Program AProgram, uint? AArgument1, uint? AArgument2)
+		public static uint? InternalExecute(uint? AArgument1, uint? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2690,7 +2690,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-        public static long? InternalExecute(Program program, long? argument1, long? argument2)
+        public static long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2724,7 +2724,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static ulong? InternalExecute(Program AProgram, ulong? AArgument1, ulong? AArgument2)
+		public static ulong? InternalExecute(ulong? AArgument1, ulong? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2758,7 +2758,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					);
 		}
 
-		public static double? InternalExecute(Program AProgram, double? AArgument1, double? AArgument2)
+		public static double? InternalExecute(double? AArgument1, double? AArgument2)
 		{
 #if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
@@ -2787,7 +2787,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 - (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
@@ -2811,7 +2811,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (decimal)argument1 - (decimal)argument2;
 		}
 
-        public static decimal? InternalExecute(Program program, decimal? argument1, decimal? argument2)
+        public static decimal? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)
