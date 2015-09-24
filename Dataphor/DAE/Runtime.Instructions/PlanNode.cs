@@ -504,7 +504,9 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             try {
                 // emit the epilogue
                 var retType = this.ILNativeType();
-                if (retType.IsValueType)
+                if (retType == typeof(void))
+                    plan.ILGenerator.Emit(OpCodes.Ldnull);
+                else if (retType.IsValueType)
                     plan.ILGenerator.Emit(OpCodes.Box, this.ILNativeType());
                 else
                     plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
