@@ -354,7 +354,16 @@ namespace Alphora.Dataphor.DAE.Runtime
 			{
 				long startTicks = TimingUtility.CurrentTicks;
                 if (_code.ILMethod != null)
-                    result = _code.ILMethod(this);
+                {
+                    try {
+                        result = _code.ILMethod(this);
+                    }
+                    catch (InvalidProgramException ex)
+                    {
+                        // until we find out how to compile CallNode...
+                        result = _code.Execute(this);
+                    }
+                }
                 else
                     result = _code.Execute(this);
 				_statistics.ExecuteTime = TimingUtility.TimeSpanFromTicks(startTicks);
