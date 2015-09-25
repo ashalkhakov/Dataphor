@@ -474,9 +474,37 @@ namespace Alphora.Dataphor.DAE.Compiling
 		{
 			return _serverProcess.InLoadingContext();
 		}
-		
-		// A Temporary catalog where catalog objects are registered during compilation
-		protected Schema.Catalog _planCatalog;
+
+        // Loop context
+        protected LoopContexts _loopContexts = new LoopContexts();
+        public void PushLoopContext(LoopContext context)
+        {
+            _loopContexts.Add(context);
+        }
+
+        public void PopLoopContext()
+        {
+            _loopContexts.RemoveAt(_loopContexts.Count - 1);
+        }
+
+        public LoopContext LoopContext { get { return _loopContexts[_loopContexts.Count - 1]; } }
+
+        // Exception context
+        protected ExceptionContexts _exceptionContexts = new ExceptionContexts();
+        public void PushExceptionContext(ExceptionContext context)
+        {
+            _exceptionContexts.Add(context);
+        }
+
+        public void PopExceptionContext()
+        {
+            _exceptionContexts.RemoveAt(_exceptionContexts.Count - 1);
+        }
+
+        public ExceptionContext ExceptionContext { get { return _exceptionContexts[_exceptionContexts.Count - 1]; } }
+
+        // A Temporary catalog where catalog objects are registered during compilation
+        protected Schema.Catalog _planCatalog;
 		public Schema.Catalog PlanCatalog
 		{
 			get

@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace Alphora.Dataphor.DAE.Runtime.Instructions
 {
@@ -308,10 +309,87 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 					return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), (string)arguments[0], false), (int)arguments[1], (string)arguments[2], (Exception)arguments[3]);
 			}
 		}
-	}
-	
-	/// <remarks>operator System.Error.ReadSeverity(const AValue : Error) : String;</remarks>
-	public class SystemErrorReadSeverityNode : InstructionNode
+
+        //	operator System.Error(const AMessage : String) : System.Error;
+        public static DataphorException InternalExecute(string message)
+        {
+#if NILPROPOGATION
+            if (message == null)
+                return null;
+#endif
+
+            return new DataphorException(ErrorSeverity.User, DataphorException.ApplicationError, message);
+        }
+        // operator System.Error(const AMessage : String, const AInnerError : System.Error) : System.Error;
+        public static DataphorException InternalExecute(string argument1, DataphorException argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+            return new DataphorException(ErrorSeverity.User, DataphorException.ApplicationError, argument1, (Exception)argument2);
+        }
+
+        // operator System.Error(const ACode : Integer, const AMessage : String) : Error;
+        public static DataphorException InternalExecute(int? argument1, string argument2) {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+            return new DataphorException(ErrorSeverity.User, (int)argument1, argument2);
+        }
+        // operator System.Error(const ACode : Integer, const AMessage : String, const AInnerError : System.Error) : Error;
+        public static DataphorException InternalExecute(int? argument1, string argument2, DataphorException argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            return new DataphorException(ErrorSeverity.User, (int)argument1, argument2, (Exception)argument3);
+        }
+        // operator System.Error(const ASeverity : String, const AMessage : String) : Error;
+        public static DataphorException InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+            return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), argument1, false), DataphorException.ApplicationError, argument2);
+        }
+        // operator System.Error(const ASeverity : String, const AMessage : String, const AInnerError : Error) : Error;
+        public static DataphorException InternalExecute(string argument1, string argument2, DataphorException argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+            return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), argument1, false), DataphorException.ApplicationError, argument2, (Exception)argument3);
+        }
+
+        // operator System.Error(const ASeverity : String, const ACode : Integer, const AMessage : String) : Error;
+        public static DataphorException InternalExecute(string argument1, int? argument2, string argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+            return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), argument1, false), (int)argument2, (string)argument3);
+        }
+        // operator System.Error(const ASeverity : String, const ACode : Integer, const AMessage : String, const AInnerError : Error) : Error;
+        public static DataphorException InternalExecute(string argument1, int? argument2, string argument3, DataphorException argument4)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null || argument4 == null)
+                return null;
+#endif
+
+            return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), (string)argument1, false), (int)argument2, (string)argument3, (Exception)argument4);
+        }
+    }
+
+    /// <remarks>operator System.Error.ReadSeverity(const AValue : Error) : String;</remarks>
+    public class SystemErrorReadSeverityNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -323,10 +401,21 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			DataphorException exception = (Exception)arguments[0] as DataphorException;
 			return (exception == null ? ErrorSeverity.Application : exception.Severity).ToString();
 		}
-	}
-	
-	/// <remarks>operator System.Error.WriteSeverity(const AValue : Error, const ASeverity : String) : Error;</remarks>
-	public class SystemErrorWriteSeverityNode : InstructionNode
+
+        public static string InternalExecute(Exception argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            DataphorException exception = argument1 as DataphorException;
+            return (exception == null ? ErrorSeverity.Application : exception.Severity).ToString();
+        }
+    }
+
+    /// <remarks>operator System.Error.WriteSeverity(const AValue : Error, const ASeverity : String) : Error;</remarks>
+    public class SystemErrorWriteSeverityNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -342,10 +431,25 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), (string)arguments[1], false), DataphorException.ApplicationError, exception.Message, exception.InnerException);
 		}
-	}
-	
-	/// <remarks>operator System.Error.ReadCode(const AValue : Error) : Integer;</remarks>
-	public class SystemErrorReadCodeNode : InstructionNode
+
+        public static DataphorException InternalExecute(Exception argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            Exception exception = argument1;
+            DataphorException dataphorException = exception as DataphorException;
+            if (dataphorException != null)
+                return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), argument2, false), dataphorException.Code, dataphorException.Message, dataphorException.InnerException);
+            else
+                return new DataphorException((ErrorSeverity)Enum.Parse(typeof(ErrorSeverity), argument2, false), DataphorException.ApplicationError, exception.Message, exception.InnerException);
+        }
+    }
+
+    /// <remarks>operator System.Error.ReadCode(const AValue : Error) : Integer;</remarks>
+    public class SystemErrorReadCodeNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -357,10 +461,21 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			DataphorException exception = (Exception)arguments[0] as DataphorException;
 			return exception == null ? DataphorException.ApplicationError : exception.Code;
 		}
-	}
-	
-	/// <remarks>operator System.Error.WriteCode(const AValue : Error, const ACode : Integer) : Error;</remarks>
-	public class SystemErrorWriteCodeNode : InstructionNode
+
+        public static int? InternalExecute(Exception argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            DataphorException exception = (Exception)argument1 as DataphorException;
+            return exception == null ? DataphorException.ApplicationError : exception.Code;
+        }
+    }
+
+    /// <remarks>operator System.Error.WriteCode(const AValue : Error, const ACode : Integer) : Error;</remarks>
+    public class SystemErrorWriteCodeNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -376,10 +491,25 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return new DataphorException(ErrorSeverity.Application, (int)arguments[1], exception.Message, exception.InnerException);
 		}
-	}
-	
-	/// <remarks>operator System.Error.ReadMessage(const AValue : Error) : String;</remarks>
-	public class SystemErrorReadMessageNode : InstructionNode
+
+        public static Exception InternalExecute(Exception argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            Exception exception = argument1;
+            DataphorException dataphorException = exception as DataphorException;
+            if (dataphorException != null)
+                return new DataphorException(dataphorException.Severity, (int)argument2, dataphorException.Message, dataphorException.InnerException);
+            else
+                return new DataphorException(ErrorSeverity.Application, (int)argument2, exception.Message, exception.InnerException);
+        }
+    }
+
+    /// <remarks>operator System.Error.ReadMessage(const AValue : Error) : String;</remarks>
+    public class SystemErrorReadMessageNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -390,10 +520,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((Exception)arguments[0]).Message;
 		}
-	}
-	
-	/// <remarks>operator System.Error.WriteMessage(const AValue : Error, const AMessage : String) : Error;</remarks>
-	public class SystemErrorWriteMessageNode : InstructionNode
+
+        public static string InternalExecute(Exception argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return argument1.Message;
+        }
+    }
+
+    /// <remarks>operator System.Error.WriteMessage(const AValue : Error, const AMessage : String) : Error;</remarks>
+    public class SystemErrorWriteMessageNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -409,10 +549,25 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return new DataphorException(ErrorSeverity.Application, DataphorException.ApplicationError, (string)arguments[1], exception.InnerException);
 		}
-	}
-	
-	/// <remarks>operator System.Error.ReadInnerError(const AValue : Error) : Error;</remarks>
-	public class SystemErrorReadInnerErrorNode : InstructionNode
+
+        public static Exception InternalExecute(Exception argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            Exception exception = argument1;
+            DataphorException dataphorException = exception as DataphorException;
+            if (dataphorException != null)
+                return new DataphorException(dataphorException.Severity, dataphorException.Code, argument2, dataphorException.InnerException);
+            else
+                return new DataphorException(ErrorSeverity.Application, DataphorException.ApplicationError, argument2, exception.InnerException);
+        }
+    }
+
+    /// <remarks>operator System.Error.ReadInnerError(const AValue : Error) : Error;</remarks>
+    public class SystemErrorReadInnerErrorNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -423,10 +578,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((Exception)arguments[0]).InnerException;
 		}
-	}
-	
-	/// <remarks>operator System.Error.WriteInnerError(const AValue : Error, const AInnerError : Error) : Error;</remarks>
-	public class SystemErrorWriteInnerErrorNode : InstructionNode
+
+        public static Exception InternalExecute(Exception argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return argument1.InnerException;
+        }
+    }
+
+    /// <remarks>operator System.Error.WriteInnerError(const AValue : Error, const AInnerError : Error) : Error;</remarks>
+    public class SystemErrorWriteInnerErrorNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -442,10 +607,25 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return new DataphorException(ErrorSeverity.Application, DataphorException.ApplicationError, exception.Message, (Exception)arguments[1]);
 		}
-	}
-	
-	/// <remarks>operator System.Diagnostics.GetErrorDescription(const AValue : Error) : String;</remarks>
-	public class SystemGetErrorDescriptionNode : InstructionNode
+
+        public static Exception InternalExecute(Exception argument1, Exception argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument1 == null)
+                return null;
+#endif
+
+            Exception exception = argument1;
+            DataphorException dataphorException = exception as DataphorException;
+            if (dataphorException != null)
+                return new DataphorException(dataphorException.Severity, dataphorException.Code, dataphorException.Message, argument1);
+            else
+                return new DataphorException(ErrorSeverity.Application, DataphorException.ApplicationError, exception.Message, argument1);
+        }
+    }
+
+    /// <remarks>operator System.Diagnostics.GetErrorDescription(const AValue : Error) : String;</remarks>
+    public class SystemGetErrorDescriptionNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -456,10 +636,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ExceptionUtility.BriefDescription((Exception)arguments[0]);
 		}
-	}
-	
-	/// <remarks>operator System.Diagnostics.GetDetailedErrorDescription(const AValue : Error) : String;</remarks>
-	public class SystemGetDetailedErrorDescriptionNode : InstructionNode
+
+        public static string InternalExecute(Exception argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ExceptionUtility.BriefDescription(argument1);
+        }
+    }
+
+    /// <remarks>operator System.Diagnostics.GetDetailedErrorDescription(const AValue : Error) : String;</remarks>
+    public class SystemGetDetailedErrorDescriptionNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -470,8 +660,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ExceptionUtility.DetailedDescription((Exception)arguments[0]);
 		}
-	}
-	
+
+        public static string InternalExecute(Exception argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ExceptionUtility.DetailedDescription(argument1);
+        }
+    }
+
     /// <remarks> operator System.Binary.Binary(AValue : String) : System.Binary </remarks>
     public class SystemBinarySelectorNode : UnaryInstructionNode
     {
@@ -555,6 +755,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return new Guid((string)argument1);
 		}
+
+        public static Guid? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return new Guid(argument1);
+        }
     }
 
     // SystemGuidReadAccessorNode
@@ -580,8 +790,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((Guid)argument1).ToString();
 		}
+
+        public static string InternalExecute(Guid? argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((Guid)argument1).ToString();
+        }
     }
-    
+
     // SystemGuidWriteAccessorNode
     public class SystemGuidWriteAccessorNode : BinaryInstructionNode
     {
@@ -594,8 +814,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return new Guid((string)argument2);
 		}
+
+        public static Guid? InternalExecute(Guid? argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument2 == null)
+                return null;
+#endif
+
+            return new Guid((string)argument2);
+        }
     }
-    
+
     // ScalarSelectorNode
     public class ScalarSelectorNode : UnaryInstructionNode
     {
@@ -801,10 +1031,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		{
 			return argument1 == null;
 		}
+
+        public static bool? InternalExecute<T>(Nullable<T> argument1) where T : struct
+        {
+            return !argument1.HasValue;
+        }
+
+        public static bool? InternalExecute(object argument1)
+        {
+            return argument1 == null;
+        }
     }
 
-	// operator IsNil(AValue : row, AColumnName : System.String) : Boolean;
-	public class IsNilRowNode : BinaryInstructionNode
+    // operator IsNil(AValue : row, AColumnName : System.String) : Boolean;
+    public class IsNilRowNode : BinaryInstructionNode
 	{
 		public override void DetermineCharacteristics(Plan plan)
 		{
@@ -836,10 +1076,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		{
 			return !(argument1 == null);
 		}
+
+        public static bool? InternalExecute<T>(Nullable<T> argument1) where T : struct
+        {
+            return argument1.HasValue;
+        }
+
+        public static bool? InternalExecute(object argument1)
+        {
+            return argument1 != null;
+        }
     }
 
-	// operator IsNotNil(AValue : row, AColumnName : System.String) : Boolean;
-	public class IsNotNilRowNode : BinaryInstructionNode
+    // operator IsNotNil(AValue : row, AColumnName : System.String) : Boolean;
+    public class IsNotNilRowNode : BinaryInstructionNode
 	{
 		public override void DetermineCharacteristics(Plan plan)
 		{
@@ -912,8 +1162,46 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				result = Nodes[1].Execute(program);
 			return DataValue.CopyValue(program.ValueManager, result);
 		}
+
+        public override void EmitIL(Plan plan)
+        {
+            var retType = ILNativeType();
+            var tempValue = plan.ILGenerator.DeclareLocal(retType);
+            var L0 = plan.ILGenerator.DefineLabel();
+            var L1 = plan.ILGenerator.DefineLabel();
+
+            Nodes[0].EmitIL(plan);
+            plan.ILGenerator.Emit(OpCodes.Stloc, tempValue);
+
+            if (retType.IsValueType)
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldloca, tempValue);
+                plan.ILGenerator.Emit(OpCodes.Call, retType.GetProperty("HasValue").GetGetMethod());
+                plan.ILGenerator.Emit(OpCodes.Brfalse, L0);
+            }
+            else
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
+                plan.ILGenerator.Emit(OpCodes.Ldnull);
+                plan.ILGenerator.Emit(OpCodes.Ceq);
+                plan.ILGenerator.Emit(OpCodes.Brtrue, L0);
+            }
+            // do the job for the true branch
+            plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
+            plan.ILGenerator.Emit(OpCodes.Br, L1);
+            plan.ILGenerator.MarkLabel(L0);
+            // do the job for the false branch
+            Nodes[1].EmitIL(plan);
+            plan.ILGenerator.MarkLabel(L1);
+            plan.ILGenerator.Emit(OpCodes.Nop); // just to mark the label
+        }
+
+        public override Type ILNativeType()
+        {
+            return Nodes[0].ILNativeType();
+        }
     }
-    
+
     /// <remarks>operator System.Diagnostics.IsSupported(AStatement : String, ADeviceName : Name) : Boolean;</remarks>
     public class SystemIsSupportedNode : InstructionNode
     {
@@ -946,12 +1234,40 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				plan.Dispose();
 			}
 		}
+
+        public static bool? InternalExecute(Program program, string deviceName, string statementString)
+        {
+            Schema.Device device = Compiler.ResolveCatalogIdentifier(program.Plan, deviceName, true) as Schema.Device;
+            if (device == null)
+                throw new CompilerException(CompilerException.Codes.DeviceIdentifierExpected);
+
+            Plan plan = new Plan(program.ServerProcess);
+            try
+            {
+                ParserMessages parserMessages = new ParserMessages();
+                Statement statement = new Parser().ParseStatement(statementString, parserMessages);
+                plan.Messages.AddRange(parserMessages);
+
+                PlanNode node = Compiler.Compile(plan, statement);
+                if (plan.Messages.HasErrors)
+                    throw new ServerException(ServerException.Codes.UncompiledPlan, plan.Messages.ToString(CompilerErrorLevel.NonFatal));
+                if (node is FrameNode)
+                    node = node.Nodes[0];
+                if ((node is ExpressionStatementNode) || (node is CursorNode))
+                    node = node.Nodes[0];
+                return node.DeviceSupported && (node.Device == device);
+            }
+            finally
+            {
+                plan.Dispose();
+            }
+        }
     }
 
-	//	operator Reconcile() : table { Sequence : Integer, Error : Error };
-	//	operator Reconcile(ADeviceName : System.Name) : table { Sequence : Integer, Error : Error };
-	//	operator Reconcile(ADeviceName : System.Name, ATableName : System.Name) : table { Sequence : Integer, Error : Error };
-	public class SystemReconcileNode : TableNode
+    //	operator Reconcile() : table { Sequence : Integer, Error : Error };
+    //	operator Reconcile(ADeviceName : System.Name) : table { Sequence : Integer, Error : Error };
+    //	operator Reconcile(ADeviceName : System.Name, ATableName : System.Name) : table { Sequence : Integer, Error : Error };
+    public class SystemReconcileNode : TableNode
 	{
 		public override void DetermineDataType(Plan plan)
 		{
@@ -1131,15 +1447,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		{
 			return ((IServerSession)program.ServerProcess.ServerSession).StartProcess(new ProcessInfo(program.ServerProcess.ServerSession.SessionInfo)).ProcessID;
 		}
-	}
-	
-	// create operator Execute(const AScript : String) 
-	// create operator Execute(const AScript : String, const AInParams : row) 
-	// create operator Execute(const AScript : String, const AInParams : row, var AOutParams : row) 
-	// create operator Execute(const AProcessID : Integer, const AScript : String)
-	// create operator Execute(const AProcessID : Integer, const AScript : String, const AInParams : row)
-	// create operator Execute(const AProcessID : Integer, const AScript : String, const AInParams : row, var AOutParams : row)
-	public class SystemExecuteNode : InstructionNode
+
+        public new static int? InternalExecute(Program program)
+        {
+            return ((IServerSession)program.ServerProcess.ServerSession).StartProcess(new ProcessInfo(program.ServerProcess.ServerSession.SessionInfo)).ProcessID;
+        }
+    }
+
+    // create operator Execute(const AScript : String) 
+    // create operator Execute(const AScript : String, const AInParams : row) 
+    // create operator Execute(const AScript : String, const AInParams : row, var AOutParams : row) 
+    // create operator Execute(const AProcessID : Integer, const AScript : String)
+    // create operator Execute(const AProcessID : Integer, const AScript : String, const AInParams : row)
+    // create operator Execute(const AProcessID : Integer, const AScript : String, const AInParams : row, var AOutParams : row)
+    public class SystemExecuteNode : InstructionNode
 	{
 		public static void ExecuteScript(ServerProcess process, Program program, PlanNode node, string script, DebugLocator locator)
 		{
@@ -1634,10 +1955,15 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		{
 			return Guid.NewGuid();
 		}
+
+        public static Guid? InternalExecute()
+        {
+            return Guid.NewGuid();
+        }
     }
-    
-	/// <remarks>operator GetDefaultDeviceName();</remarks>    
-	/// <remarks>operator GetDefaultDeviceName(ALibraryName : Name);</remarks>
+
+    /// <remarks>operator GetDefaultDeviceName();</remarks>    
+    /// <remarks>operator GetDefaultDeviceName(ALibraryName : Name);</remarks>
     public class SystemGetDefaultDeviceNameNode : InstructionNode
     {
 		public override object InternalExecute(Program program, object[] arguments)
@@ -1647,6 +1973,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return program.Plan.GetDefaultDeviceName((string)arguments[0], false);
 		}
+
+        public new static string InternalExecute(Program program)
+        {
+            return program.Plan.DefaultDeviceName;
+        }
+
+        public static string InternalExecute(Program program, string argument1)
+        {
+            return program.Plan.GetDefaultDeviceName(argument1, false);
+        }
     }
 
     /// <remarks>operator EnableErrorLogging();</remarks>
@@ -1657,7 +1993,12 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			program.ServerProcess.ServerSession.Server.LogErrors = true;
 			return null;
 		}
-	}
+
+        public new static void InternalExecute(Program program)
+        {
+            program.ServerProcess.ServerSession.Server.LogErrors = true;
+        }
+    }
 
     /// <remarks>operator EnableErrorLogging();</remarks>
     public class SystemDisableErrorLoggingNode : InstructionNode
@@ -1667,7 +2008,12 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			program.ServerProcess.ServerSession.Server.LogErrors = false;
 			return null;
 		}
-	}
+
+        public new static void InternalExecute(Program program)
+        {
+            program.ServerProcess.ServerSession.Server.LogErrors = false;
+        }
+    }
 
     /// <remarks>operator System.EncryptPassword(const AString : System.String) : System.String;</remarks>
     public class SystemEncryptPasswordNode : InstructionNode
@@ -1676,8 +2022,13 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 		{
 			return Schema.SecurityUtility.EncryptPassword((string)arguments[0]);
 		}
-	}
-    
+
+        public static string InternalExecute(string argument1)
+        {
+            return Schema.SecurityUtility.EncryptPassword(argument1);
+        }
+    }
+
     /// <remarks>operator CreateServerLinkUser(AUserID : string, AServerLinkName : System.Name, AServerUserID : string, AServerPassword : string); </remarks>
     public class SystemCreateServerLinkUserNode : InstructionNode
     {
