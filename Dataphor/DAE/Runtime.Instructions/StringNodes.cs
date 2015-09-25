@@ -37,7 +37,23 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return Convert.ToString(stringValue[index]);
 		}
 
-		public override Statement EmitStatement(EmitMode mode)
+        public static string InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int index = (int)argument2;
+
+            if ((index < 0) || (index >= stringValue.Length))
+                return String.Empty;
+
+            return Convert.ToString(stringValue[index]);
+        }
+
+        public override Statement EmitStatement(EmitMode mode)
 		{
 			IndexerExpression expression = new D4IndexerExpression();
 			expression.Expression = (Expression)Nodes[0].EmitStatement(mode);
@@ -59,10 +75,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).Length;
 		}
-	}
-	
-	// operator SubString(AString : System.String, AStart : System.String) : System.String
-	public class StringSubStringNode : BinaryInstructionNode
+
+        public static int? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((string)argument1).Length;
+        }
+    }
+
+    // operator SubString(AString : System.String, AStart : System.String) : System.String
+    public class StringSubStringNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -79,10 +105,26 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				startIndex = 0;
 			return stringValue.Substring(startIndex, stringValue.Length - startIndex);
 		}
-	}
-	
-	// operator SubString(AString : System.String, AStart : System.String, ALength : System.Integer) : System.String
-	public class StringSubStringTernaryNode : TernaryInstructionNode
+
+        public static string InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int startIndex = (int)argument2;
+            if (startIndex > stringValue.Length)
+                startIndex = stringValue.Length;
+            else if (startIndex < 0)
+                startIndex = 0;
+            return stringValue.Substring(startIndex, stringValue.Length - startIndex);
+        }
+    }
+
+    // operator SubString(AString : System.String, AStart : System.String, ALength : System.Integer) : System.String
+    public class StringSubStringTernaryNode : TernaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2, object argument3)
 		{
@@ -104,10 +146,31 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				
 			return stringValue.Substring(startIndex, length);
 		}
-	}
-	
-	// operator Pos(ASubString : System.String, AString : System.String) : System.Integer
-	public class StringPosNode : BinaryInstructionNode
+
+        public static string InternalExecute(string argument1, int? argument2, int? argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int startIndex = (int)argument2;
+            if (startIndex > stringValue.Length)
+                startIndex = stringValue.Length;
+            else if (startIndex < 0)
+                startIndex = 0;
+
+            int length = (int)argument3;
+            if ((startIndex + length) > stringValue.Length)
+                length = stringValue.Length - startIndex;
+
+            return stringValue.Substring(startIndex, length);
+        }
+    }
+
+    // operator Pos(ASubString : System.String, AString : System.String) : System.Integer
+    public class StringPosNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -118,26 +181,36 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return StringUtility.IndexOf((string)argument2, (string)argument1);
 		}
-	}
 
-	#if USEISTRING	
+        public static int? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return StringUtility.IndexOf((string)argument2, (string)argument1);
+        }
+    }
+
+#if USEISTRING
 	public class IStringPosNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object AArgument1, object AArgument2)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
 				return null;
-			#endif
+#endif
 
 			return ((string)AArgument2).ToUpper().IndexOf(((string)AArgument1).ToUpper());
 		}
 	}
-	#endif
-	
-	// operator PadLeft(AString : System.String, ATotalLength : System.Integer)
-	// operator PadLeft(AString : System.String, ATotalLength : System.Integer, APadChar : System.String)
-	public class StringPadLeftNode : InstructionNode
+#endif
+
+    // operator PadLeft(AString : System.String, ATotalLength : System.Integer)
+    // operator PadLeft(AString : System.String, ATotalLength : System.Integer, APadChar : System.String)
+    public class StringPadLeftNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -151,11 +224,31 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return ((string)arguments[0]).PadLeft((int)arguments[1]);
 		}
-	}
-	
-	// operator PadRight(AString : System.String, ATotalLength : System.Integer)
-	// operator PadRight(AString : System.String, ATotalLength : System.Integer, APadChar : System.String)
-	public class StringPadRightNode : InstructionNode
+
+        public static string InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return ((string)argument1).PadLeft((int)argument2);
+        }
+
+        public static string InternalExecute(string argument1, int? argument2, string argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            return ((string)argument1).PadLeft((int)argument2, argument3[0]);
+        }
+    }
+
+    // operator PadRight(AString : System.String, ATotalLength : System.Integer)
+    // operator PadRight(AString : System.String, ATotalLength : System.Integer, APadChar : System.String)
+    public class StringPadRightNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -169,10 +262,30 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			else
 				return ((string)arguments[0]).PadRight((int)arguments[1]);
 		}
-	}
 
-	// operator Insert(AString : System.String, AStartIndex : System.Integer, AInsertString : System.String) : System.String
-	public class StringInsertNode : TernaryInstructionNode
+        public static string InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return ((string)argument1).PadRight((int)argument2);
+        }
+
+        public static string InternalExecute(string argument1, int? argument2, string argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            return ((string)argument1).PadRight((int)argument2, argument3[0]);
+        }
+    }
+
+    // operator Insert(AString : System.String, AStartIndex : System.Integer, AInsertString : System.String) : System.String
+    public class StringInsertNode : TernaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2, object argument3)
 		{
@@ -190,10 +303,27 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				
 			return stringValue.Insert(startIndex, (string)argument3);
 		}
-	}
-	
-	// operator Remove(AString : System.String, AStartIndex : System.Integer, ALength : System.Integer) : System.String
-	public class StringRemoveNode : TernaryInstructionNode
+
+        public static string InternalExecute(string argument1, int? argument2, string argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int startIndex = (int)argument2;
+            if (startIndex > stringValue.Length)
+                startIndex = stringValue.Length;
+            else if (startIndex < 0)
+                startIndex = 0;
+
+            return stringValue.Insert(startIndex, (string)argument3);
+        }
+    }
+
+    // operator Remove(AString : System.String, AStartIndex : System.Integer, ALength : System.Integer) : System.String
+    public class StringRemoveNode : TernaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2, object argument3)
 		{
@@ -216,12 +346,34 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return stringValue.Remove(startIndex, length);
 		}
-	}
-	
-	// operator Split(const AString : String) : list(String);
-	// operator Split(const AString : String, const ADelimiter : String) : list(String);
-	// operator Split(const AString : String, const ADelimiters : list(String)) : list(String);
-	public class StringSplitNode : InstructionNode
+
+        public static string InternalExecute(string argument1, int? argument2, int? argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+
+            int startIndex = (int)argument2;
+            if (startIndex > stringValue.Length)
+                startIndex = stringValue.Length;
+            else if (startIndex < 0)
+                startIndex = 0;
+
+            int length = (int)argument3;
+            if ((startIndex + length) > stringValue.Length)
+                length = stringValue.Length - startIndex;
+
+            return stringValue.Remove(startIndex, length);
+        }
+    }
+
+    // operator Split(const AString : String) : list(String);
+    // operator Split(const AString : String, const ADelimiter : String) : list(String);
+    // operator Split(const AString : String, const ADelimiters : list(String)) : list(String);
+    public class StringSplitNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -275,11 +427,11 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			
 			return tempValue;
 		}
-	}
-	
-	// operator Concat(const AStrings : list(String)) : String;
-	// operator Concat(const AStrings : list(String), const ADelimiter : String) : String;
-	public class StringConcatNode : InstructionNode
+    }
+
+    // operator Concat(const AStrings : list(String)) : String;
+    // operator Concat(const AStrings : list(String), const ADelimiter : String) : String;
+    public class StringConcatNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -336,18 +488,55 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			    return stringValue;
             }
         }
-	}
-	
-	#if USEISTRING
+
+        // operator Replace(AString : System.String, AOldString : System.String, ANewString : System.String) : System.String
+        public static string InternalExecute(string argument1, string argument2, string argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+            return StringUtility.Replace(argument1, argument2, argument3);
+        }
+
+        // operator Replace(AString : System.String, AOldString : System.String, ANewString : System.String, ACaseSensitive : System.Boolean) : System.String
+        public static string InternalExecute(string argument1, string argument2, string argument3, bool? argument4)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null || argument4 == null)
+                return null;
+#endif
+            if ((bool)argument4)
+                return StringUtility.Replace(argument1, argument2, argument3);
+            else
+            {
+                string stringValue = (string)argument1;
+                string oldString = ((string)argument2).ToUpper();
+                if (oldString.Length > 0)
+                {
+                    string newString = (string)argument3;
+                    int currentIndex = stringValue.ToUpper().IndexOf(oldString);
+                    while ((currentIndex >= 0) && (currentIndex < stringValue.Length))
+                    {
+                        stringValue = stringValue.Remove(currentIndex, Math.Min(oldString.Length, stringValue.Length - currentIndex)).Insert(currentIndex, newString);
+                        currentIndex = stringValue.ToUpper().IndexOf(oldString, currentIndex + newString.Length);
+                    }
+                }
+                return stringValue;
+            }
+        }
+    }
+
+#if USEISTRING
 	// operator Replace(AString : System.String, AOldString : System.String, ANewString : System.String) : System.String
 	public class IStringReplaceNode : InstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object[] AArguments)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArguments[0] == null || AArguments[1] == null || AArguments[2] == null)
 				return null;
-			#endif
+#endif
 
 			string LString = (string)AArguments[0];
 			string LOldString = (string)AArguments[1].ToUpper();
@@ -364,10 +553,10 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return LString;
 		}
 	}
-	#endif
-	
-	// operator Trim(AString : System.String) : System.String
-	public class StringTrimNode : UnaryInstructionNode
+#endif
+
+    // operator Trim(AString : System.String) : System.String
+    public class StringTrimNode : UnaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -378,10 +567,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).Trim();
 		}
-	}
-	
-	// operator TrimLeft(AString : System.String) : System.String
-	public class StringTrimLeftNode : UnaryInstructionNode
+
+        public static string InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((string)argument1).Trim();
+        }
+    }
+
+    // operator TrimLeft(AString : System.String) : System.String
+    public class StringTrimLeftNode : UnaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -392,10 +591,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).TrimStart(null);
 		}
-	}
-	
-	// operator TrimRight(AString : System.String) : System.String
-	public class StringTrimRightNode : UnaryInstructionNode
+
+        public static string InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((string)argument1).TrimStart(null);
+        }
+    }
+
+    // operator TrimRight(AString : System.String) : System.String
+    public class StringTrimRightNode : UnaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -406,10 +615,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).TrimEnd(null);
 		}
-	}
-	
-	// operator LastPos(ASubString : System.String, AString : System.String) : System.Integer
-	public class StringLastPosNode : BinaryInstructionNode
+
+        public static string InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((string)argument1).TrimEnd(null);
+        }
+    }
+
+    // operator LastPos(ASubString : System.String, AString : System.String) : System.Integer
+    public class StringLastPosNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -420,24 +639,34 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return StringUtility.LastIndexOf((string)argument2, (string)argument1);
 		}
-	}
-	
-	#if USEISTRING
+
+        public static int? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return StringUtility.LastIndexOf((string)argument2, (string)argument1);
+        }
+    }
+
+#if USEISTRING
 	public class IStringLastPosNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object AArgument1, object AArgument2)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
 				return null;
-			#endif
+#endif
 
 			return (string)AArgument2.ToUpper().LastIndexOf((string)AArgument1.ToUpper());
 		}
 	}
-	#endif
-	
-	public class StringIndexOfNode : BinaryInstructionNode
+#endif
+
+    public class StringIndexOfNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -448,9 +677,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return StringUtility.IndexOf((string)argument1, (string)argument2);
 		}
-	}
 
-	public class StringIndexOfStartNode : InstructionNode
+        public static int? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return StringUtility.IndexOf((string)argument1, (string)argument2);
+        }
+    }
+
+    public class StringIndexOfStartNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -474,9 +713,32 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 			return result;
 		}
-	}
 
-	public class StringIndexOfStartLengthNode : InstructionNode
+        public static int? InternalExecute(string argument1, string argument2, int? argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            string stringValue = argument1;
+            int result;
+            if (stringValue == String.Empty)
+                result = -1;
+            else
+            {
+                int startIndex = (int)argument3;
+                if (startIndex > stringValue.Length)
+                    startIndex = stringValue.Length;
+                else if (startIndex < 0)
+                    startIndex = 0;
+                result = StringUtility.IndexOf(stringValue, (string)argument2, startIndex);
+            }
+            return result;
+        }
+    }
+
+    public class StringIndexOfStartLengthNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -505,9 +767,37 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 			return result;
 		}
-	}
 
-	public class StringStartsWith : BinaryInstructionNode
+        public static int? InternalExecute(string argument1, string argument2, int? argument3, int? argument4)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null || argument4 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int startIndex = (int)argument3;
+            int length = (int)argument4;
+            int result;
+            if ((stringValue == String.Empty) || (startIndex >= stringValue.Length))
+            {
+                if (length < 0)
+                    throw new RuntimeException(RuntimeException.Codes.InvalidLength, ErrorSeverity.Application);
+                result = -1;
+            }
+            else
+            {
+                if (startIndex < 0)
+                    startIndex = 0;
+                if ((startIndex + length) > stringValue.Length)
+                    length = stringValue.Length - startIndex;
+                result = StringUtility.IndexOf(stringValue, (string)argument2, startIndex, length);
+            }
+            return result;
+        }
+    }
+
+    public class StringStartsWith : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -518,9 +808,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).StartsWith((string)argument2);
 		}
-	}
-	
-	public class StringEndsWith : BinaryInstructionNode
+
+        public static bool? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return ((string)argument1).StartsWith((string)argument2);
+        }
+    }
+
+    public class StringEndsWith : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -531,24 +831,34 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).EndsWith((string)argument2);
 		}
-	}
-	
-	#if USEISTRING
+
+        public static bool? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return ((string)argument1).EndsWith((string)argument2);
+        }
+    }
+
+#if USEISTRING
 	public class IStringIndexOfNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object AArgument1, object AArgument2)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
 				return null;
-			#endif
+#endif
 
 			return ((string)AArgument1).ToUpper().IndexOf((string)AArgument2.ToUpper());
 		}
 	}
-	#endif
-	
-	public class StringIndexOfAnyNode : InstructionNode
+#endif
+
+    public class StringIndexOfAnyNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -600,27 +910,27 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return result;
 		}
-	}
-	
-	#if USEISTRING
+    }
+
+#if USEISTRING
 	public class IStringIndexOfAnyNode : InstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object[] AArguments)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArguments[0] == null || AArguments[1] == null)
 				return null;
-			#endif
+#endif
 
 			int LIndexOf = -1;
 			string LString = ((string)AArguments[0]).ToUpper();
 			ListValue LAnyOf = (ListValue)AArguments[1];
 			for (int LIndex = 0; LIndex < LAnyOf.Length(); LIndex++)
 			{
-				#if NILPROPOGATION
+#if NILPROPOGATION
 				if ((LAnyOf[LIndex] == null))
 					return null;
-				#endif
+#endif
 
 				LIndexOf = LString.IndexOf(LAnyOf[LIndex].AsString.ToUpper());
 				if (LIndexOf >= 0)
@@ -630,9 +940,9 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return LIndexOf;
 		}
 	}
-	#endif
-	
-	public class StringLastIndexOfNode : BinaryInstructionNode
+#endif
+
+    public class StringLastIndexOfNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -643,9 +953,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return StringUtility.LastIndexOf((string)argument1, (string)argument2);
 		}
-	}
 
-	public class StringLastIndexOfStartNode : TernaryInstructionNode
+        public static int? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return StringUtility.LastIndexOf((string)argument1, (string)argument2);
+        }
+    }
+
+    public class StringLastIndexOfStartNode : TernaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2, object argument3)
 		{
@@ -669,9 +989,32 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 			return result;
 		}
-	}
 
-	public class StringLastIndexOfStartLengthNode : InstructionNode
+        public static int? InternalExecute(string argument1, string argument2, int? argument3)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int result;
+            if (stringValue == String.Empty)
+                result = -1;
+            else
+            {
+                int startIndex = (int)argument3;
+                if (startIndex > (stringValue.Length - 1))
+                    startIndex = (stringValue.Length - 1);
+                else if (startIndex < -1)
+                    startIndex = -1;
+                result = StringUtility.LastIndexOf(stringValue, (string)argument2, startIndex);
+            }
+            return result;
+        }
+    }
+
+    public class StringLastIndexOfStartLengthNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -700,24 +1043,52 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 			return result;
 		}
-	}
 
-	#if USEISTRING
+        public static int? InternalExecute(string argument1, string argument2, int? argument3, int? argument4)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null || argument3 == null || argument4 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int startIndex = (int)argument3;
+            int length = (int)argument4;
+            int result;
+            if ((startIndex < 0) || (stringValue == String.Empty))
+            {
+                if (length < 0)
+                    throw new RuntimeException(RuntimeException.Codes.InvalidLength, ErrorSeverity.Application);
+                result = -1;
+            }
+            else
+            {
+                if (startIndex > (stringValue.Length - 1))
+                    startIndex = (stringValue.Length - 1);
+                if ((startIndex - length) < -1)
+                    length = startIndex + 1;
+                result = StringUtility.LastIndexOf(stringValue, (string)argument2, startIndex, length);  // will throw if ALength < 0
+            }
+            return result;
+        }
+    }
+
+#if USEISTRING
 	public class IStringLastIndexOfNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object AArgument1, object AArgument2)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
 				return null;
-			#endif
+#endif
 
 			return ((string)AArgument1).ToUpper().LastIndexOf(((string)AArgument2).ToUpper());
 		}
 	}
-	#endif
-	
-	public class StringLastIndexOfAnyNode : InstructionNode
+#endif
+
+    public class StringLastIndexOfAnyNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -769,27 +1140,27 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return result;
 		}
-	}
-	
-	#if USEISTRING
+    }
+
+#if USEISTRING
 	public class IStringLastIndexOfAnyNode : InstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object[] AArguments)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArguments[0] == null || AArguments[1] == null)
 				return null;
-			#endif
+#endif
 
 			int LLastIndexOf = -1;
 			string LString = (string)AArguments[0].ToUpper();
 			ListValue LAnyOf = (ListValue)AArguments[1];
 			for (int LIndex = 0; LIndex < LAnyOf.Count(); LIndex++)
 			{
-				#if NILPROPOGATION
+#if NILPROPOGATION
 				if (LAnyOf[LIndex] == null)
 					return null;
-				#endif
+#endif
 
 				LLastIndexOf = LString.LastIndexOf(LAnyOf[LIndex].AsString.ToUpper());
 				if (LLastIndexOf >= 0)
@@ -799,10 +1170,10 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return LLastIndexOf;
 		}
 	}
-	#endif
-	
-	// operator CountOf(AString : System.String, ASubString : System.String) : System.Integer
-	public class StringCountOfNode : BinaryInstructionNode
+#endif
+
+    // operator CountOf(AString : System.String, ASubString : System.String) : System.Integer
+    public class StringCountOfNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -829,10 +1200,36 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 			return totalFinds;
 		}
-	}
 
-	// operator Upper(string) : string;
-	public class StringUpperNode : UnaryInstructionNode
+        public static int? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            int found = 0;
+            int totalFinds = 0;
+            string stringValue = (string)argument1;
+            string subString = (string)argument2;
+
+            for (int i = 0; i < stringValue.Length; i++)
+            {
+                found = StringUtility.IndexOf(stringValue, subString, i);
+                if (found >= 0)
+                {
+                    totalFinds++;
+                    i = found;
+                }
+                else
+                    break;
+            }
+            return totalFinds;
+        }
+    }
+
+    // operator Upper(string) : string;
+    public class StringUpperNode : UnaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -843,10 +1240,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).ToUpper();
 		}
-	}
-	
-	// operator Lower(string) : string;
-	public class StringLowerNode : UnaryInstructionNode
+
+        public static string InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((string)argument1).ToUpper();
+        }
+    }
+
+    // operator Lower(string) : string;
+    public class StringLowerNode : UnaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -857,10 +1264,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return ((string)argument1).ToLower();
 		}
-	}
-	
-	// operator iLike(string, string) : boolean
-	public abstract class StringLikeNodeBase : BinaryInstructionNode
+
+        public static string InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            return ((string)argument1).ToLower();
+        }
+    }
+
+    // operator iLike(string, string) : boolean
+    public abstract class StringLikeNodeBase : BinaryInstructionNode
 	{
 		protected const int RegexCacheSize = 20;
 		protected static FixedSizeCache<string, Regex> _regexCache = new FixedSizeCache<string, Regex>(RegexCacheSize);
@@ -935,7 +1352,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			Match match = regex.Match(stringValue);
 			return match.Success && (match.Index == 0);
 		}
-	}
+    }
 	
 	#if USEISTRING
 	public class IStringLikeNode : StringLikeNodeBase
@@ -996,11 +1413,21 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return String.Compare((string)argument1, (string)argument2, StringComparison.OrdinalIgnoreCase);
 		}
-	}
-	
-	// Unicode representation
-	// operator System.String.Unicode(const AUnicode : list(System.Integer)) : System.String;
-	public class SystemStringUnicodeNode : UnaryInstructionNode
+
+        public static int? InternalExecute(string argument1, string argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            return String.Compare((string)argument1, (string)argument2, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    // Unicode representation
+    // operator System.String.Unicode(const AUnicode : list(System.Integer)) : System.String;
+    public class SystemStringUnicodeNode : UnaryInstructionNode
 	{
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -1304,11 +1731,45 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Char.IsUpper(stringValue, index);
 			}
 		}
-	}
 
-	// operator System.IsLower(const AValue : String) : Boolean;	
-	// operator System.IsLower(const AValue : String, const AIndex : Integer) : Boolean;
-	public class StringIsLowerNode : InstructionNode
+        public static bool? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            string tempValue = (string)argument1;
+            bool isUpper = true;
+            for (int index = 0; index < tempValue.Length; index++)
+                if (Char.IsLetter(tempValue, index) && !Char.IsUpper(tempValue, index))
+                {
+                    isUpper = false;
+                    break;
+                }
+
+            return isUpper;
+        }
+
+        public static bool? InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int index = (int)argument2;
+            if ((index < 0) || (index >= stringValue.Length))
+                return false;
+
+            return Char.IsUpper(stringValue, index);
+        }
+    }
+
+    // operator System.IsLower(const AValue : String) : Boolean;	
+    // operator System.IsLower(const AValue : String, const AIndex : Integer) : Boolean;
+    public class StringIsLowerNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -1345,11 +1806,45 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Char.IsLower(stringValue, index);
 			}
 		}
-	}
-	
-	// operator System.IsLetter(const AValue : String) : Boolean;	
-	// operator System.IsLetter(const AValue : String, const AIndex : Integer) : Boolean;
-	public class StringIsLetterNode : InstructionNode
+
+        public static bool? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            string tempValue = (string)argument1;
+            bool isLower = true;
+            for (int index = 0; index < tempValue.Length; index++)
+                if (Char.IsLetter(tempValue, index) && !Char.IsLower(tempValue, index))
+                {
+                    isLower = false;
+                    break;
+                }
+
+            return isLower;
+        }
+
+        public static bool? InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int index = (int)argument2;
+            if ((index < 0) || (index >= stringValue.Length))
+                return false;
+
+            return Char.IsLower(stringValue, index);
+        }
+    }
+
+    // operator System.IsLetter(const AValue : String) : Boolean;	
+    // operator System.IsLetter(const AValue : String, const AIndex : Integer) : Boolean;
+    public class StringIsLetterNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -1386,11 +1881,45 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Char.IsLetter(stringValue, index);
 			}
 		}
-	}
-	
-	// operator System.IsDigit(const AValue : String) : Boolean;	
-	// operator System.IsDigit(const AValue : String, const AIndex : Integer) : Boolean;
-	public class StringIsDigitNode : InstructionNode
+
+        public static bool? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            string tempValue = (string)argument1;
+            bool isLetter = true;
+            for (int index = 0; index < tempValue.Length; index++)
+                if (!Char.IsLetter(tempValue, index))
+                {
+                    isLetter = false;
+                    break;
+                }
+
+            return isLetter;
+        }
+
+        public static bool? InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int index = (int)argument2;
+            if ((index < 0) || (index >= stringValue.Length))
+                return false;
+
+            return Char.IsLetter(stringValue, index);
+        }
+    }
+
+    // operator System.IsDigit(const AValue : String) : Boolean;	
+    // operator System.IsDigit(const AValue : String, const AIndex : Integer) : Boolean;
+    public class StringIsDigitNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -1427,11 +1956,45 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Char.IsDigit(stringValue, index);
 			}
 		}
-	}
-	
-	// operator System.IsLetterOrDigit(const AValue : String) : Boolean;	
-	// operator System.IsLetterOrDigit(const AValue : String, const AIndex : Integer) : Boolean;
-	public class StringIsLetterOrDigitNode : InstructionNode
+
+        public static bool? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            string tempValue = (string)argument1;
+            bool isDigit = true;
+            for (int index = 0; index < tempValue.Length; index++)
+                if (!Char.IsDigit(tempValue, index))
+                {
+                    isDigit = false;
+                    break;
+                }
+
+            return isDigit;
+        }
+
+        public static bool? InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int index = (int)argument2;
+            if ((index < 0) || (index >= stringValue.Length))
+                return false;
+
+            return Char.IsDigit(stringValue, index);
+        }
+    }
+
+    // operator System.IsLetterOrDigit(const AValue : String) : Boolean;	
+    // operator System.IsLetterOrDigit(const AValue : String, const AIndex : Integer) : Boolean;
+    public class StringIsLetterOrDigitNode : InstructionNode
 	{
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -1468,9 +2031,43 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Char.IsLetterOrDigit(stringValue, index);
 			}
 		}
-	}
-	
-	#if USEISTRING
+
+        public static bool? InternalExecute(string argument1)
+        {
+#if NILPROPOGATION
+            if (argument1 == null)
+                return null;
+#endif
+
+            string tempValue = (string)argument1;
+            bool isLetterOrDigit = true;
+            for (int index = 0; index < tempValue.Length; index++)
+                if (!Char.IsLetterOrDigit(tempValue, index))
+                {
+                    isLetterOrDigit = false;
+                    break;
+                }
+
+            return isLetterOrDigit;
+        }
+
+        public static bool? InternalExecute(string argument1, int? argument2)
+        {
+#if NILPROPOGATION
+            if (argument1 == null || argument2 == null)
+                return null;
+#endif
+
+            string stringValue = (string)argument1;
+            int index = (int)argument2;
+            if ((index < 0) || (index >= stringValue.Length))
+                return false;
+
+            return Char.IsLetterOrDigit(stringValue, index);
+        }
+    }
+
+#if USEISTRING
 	// operator System.EnsureUpper(var AValue : IString);
 	public class IStringEnsureUpperNode : InstructionNode
 	{
@@ -1492,10 +2089,10 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return null;
 		}
 	}
-	#endif
+#endif
 
-	/// <remarks> The string searching routines in the StringUtility class treat the empty string as though it does not exist in any string.  The standard .NET routines treat the empty string as though it exists in all strings. </remarks>
-	public sealed class StringUtility
+    /// <remarks> The string searching routines in the StringUtility class treat the empty string as though it does not exist in any string.  The standard .NET routines treat the empty string as though it exists in all strings. </remarks>
+    public sealed class StringUtility
 	{
 		public static int IndexOf(string stringValue, string searchFor)
 		{

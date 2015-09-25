@@ -114,7 +114,7 @@ namespace Alphora.Dataphor.DAE.Schema
 			get { return _blockNode; }
 			set { _blockNode = value; }
         }
-        
+     
         public void EmitStatement(EmitMode mode, D4.OperatorBlock block)
         {
 			if (ClassDefinition != null)

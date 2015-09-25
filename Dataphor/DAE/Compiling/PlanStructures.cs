@@ -77,4 +77,38 @@ namespace Alphora.Dataphor.DAE.Compiling
 	}
 	
 	public class CursorContexts : List<CursorContext> { }
+
+    // Loop contexts
+    public class LoopContext : System.Object
+    {
+        public LoopContext(System.Reflection.Emit.Label cont, System.Reflection.Emit.Label brk) : base()
+        {
+            _continue = cont;
+            _break = brk;
+        }
+
+        private System.Reflection.Emit.Label _continue;
+        private System.Reflection.Emit.Label _break;
+
+        public System.Reflection.Emit.Label Continue { get { return _continue; } }
+        public System.Reflection.Emit.Label Break { get { return _break; } }
+
+    }
+
+    public class LoopContexts : List<LoopContext> { }
+
+    // Exception contexts
+    public class ExceptionContext : System.Object
+    {
+        public ExceptionContext(System.Reflection.Emit.Label leave) : base()
+        {
+            _leave = leave;
+        }
+
+        private System.Reflection.Emit.Label _leave;
+
+        public System.Reflection.Emit.Label Leave { get { return _leave; } }
+    }
+
+    public class ExceptionContexts : List<ExceptionContext> { }
 }
