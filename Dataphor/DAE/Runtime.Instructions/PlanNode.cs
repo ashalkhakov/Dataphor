@@ -492,6 +492,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         }
         public void StartEmitIL(Plan plan)
         {
+            // just begin a new anonymous dynamic method
             var gen = plan.ILGenerator;
         }
         private Func<Program, object> _ilMethod;
@@ -501,7 +502,8 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         }
         public void FinishEmitIL(Plan plan)
         {
-            try {
+            try
+            {
                 // emit the epilogue
                 var retType = this.ILNativeType();
                 if (retType == typeof(void))
@@ -512,8 +514,8 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                     plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
                 plan.ILGenerator.Emit(OpCodes.Ret);
 
-                // try to create a dynamic method
-                _ilMethod = plan.CreateDynamicMethod();
+                // try to create a dynamic method delegate
+                _ilMethod = plan.CreateDynamicMethodDelegate();
             }
             catch (Exception e)
             {
