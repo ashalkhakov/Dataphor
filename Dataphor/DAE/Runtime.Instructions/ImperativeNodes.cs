@@ -202,16 +202,26 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
         public override void EmitIL(Plan plan)
         {
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-
             Nodes[0].EmitIL(plan);
             var retType = Nodes[0].ILNativeType();
-            if (retType.IsValueType)
-                plan.ILGenerator.Emit(OpCodes.Box, retType);
-            else
-                plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
 
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("DisposeValue"));
+            if (retType == typeof(void))
+            {
+                // nothing to dispose of
+            }
+            else
+            {
+                if (retType.IsValueType)
+                {
+                    var hostType = retType.GetGenericArguments()[0];
+
+                    plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
+                }
+                else
+                    plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
+
+                plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("DisposeValue"));
+            }
         }
 
         public override Type ILNativeType()
@@ -1814,9 +1824,264 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				program.Plan.PopSecurityContext();
 			}
 		}
-	}
-	
-	public class VariableNode : PlanNode
+
+        public static bool CodeBlock0(Program program)
+        {
+            bool saveIsInsert = program.ServerProcess.IsInsert;
+            program.ServerProcess.IsInsert = false;
+            return saveIsInsert;
+        }
+        public static void CodeBlock0_Undo(Program program, bool saveIsInsert)
+        {
+            program.ServerProcess.IsInsert = saveIsInsert;
+        }
+
+        public static ApplicationTransaction CodeBlock1(Program program)
+        {
+            if ((program.ServerProcess.ApplicationTransactionID != Guid.Empty))
+                return program.ServerProcess.GetApplicationTransaction();
+            return null;
+        }
+        public static void CodeBlock1_Undo(ApplicationTransaction transaction)
+        {
+            if (transaction != null)
+                Monitor.Exit(transaction);
+        }
+
+        public static void CodeBlock2(ApplicationTransaction transaction)
+        {
+            if (transaction != null)
+                transaction.PushGlobalContext();
+        }
+        public static void CodeBlock2_Undo(ApplicationTransaction transaction)
+        {
+            if (transaction != null)
+                transaction.PopGlobalContext();
+        }
+
+        public override void EmitIL(Plan plan)
+        {
+            if (Operator.Block.CompiledBlockNode == null)
+            {
+                // could be a static method call...
+                // TODO: re-factor, this is similar to InstructionNodeBase.EmitIL!
+                var types = new Type[NodeCount];
+                for (int i = 0; i < NodeCount; i++)
+                    types[i] = Nodes[i].ILNativeType();
+                var mth = Operator.Block.BlockNode.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, types, null);
+                if (mth == null)
+                {
+                    // try the fallback
+                    var newtypes = new Type[NodeCount + 1];
+                    newtypes[0] = typeof(Program);
+                    for (int i = 0; i < NodeCount; i++)
+                        newtypes[i + 1] = types[i];
+                    mth = Operator.Block.BlockNode.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, newtypes, null);
+                    if (mth == null)
+                        throw new CompilerException(CompilerException.Codes.CompilerMessage, "Calling interpreted operators unsupported!");
+
+                    // push the Program argument on stack
+                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                }
+
+                for (int i = 0; i < NodeCount; i++)
+                    Nodes[i].EmitIL(plan);
+                plan.ILGenerator.Emit(OpCodes.Call, mth);
+
+                return;
+            }
+
+            var objectValue = plan.ILGenerator.DeclareLocal(typeof(object));
+
+            for (var index = 0; index < Operator.Operands.Count; index++)
+            {
+                // FIXME: basically assignment node code!
+                var retType = Nodes[index].ILNativeType();
+                var tempValue = plan.ILGenerator.DeclareLocal(retType);
+
+                Nodes[index].EmitIL(plan);
+
+                if (retType.IsValueType)
+                {
+                    var hostType = retType.GetGenericArguments()[0];
+
+                    plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
+
+                    // finally, validate
+                    /*
+                    // FIXME: can't validate because there is no way to load an arbitrary object (ScalarType)
+                    // to stack...
+                    plan.ILGenerator.Emit(OpCodes.Call, typeof(ValueUtility).GetMethod("ValidateValue", new Type[] { typeof(Program), typeof(Schema.ScalarType), typeof(object) }));
+                    */
+                }
+                else
+                {
+                    plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
+                }
+
+                plan.ILGenerator.Emit(OpCodes.Stloc, objectValue);
+
+                // package up and push to interpreter stack
+                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
+                plan.ILGenerator.Emit(OpCodes.Ldloc, objectValue);
+                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Push"));
+            }
+
+            var saveIsInsert = plan.ILGenerator.DeclareLocal(typeof(bool));
+
+            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+            plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock0", BindingFlags.Static | BindingFlags.Public));
+            plan.ILGenerator.Emit(OpCodes.Stloc, saveIsInsert);
+
+            LocalBuilder resultLocal = null;
+            if (_allocateResultNode != null)
+            {
+                // prepare a local variable
+                var retType = ((VariableNode)_allocateResultNode).VariableNativeType();
+                resultLocal = plan.ILGenerator.DeclareLocal(retType);
+            }
+
+            plan.ILGenerator.BeginExceptionBlock();
+            {
+                var transaction = plan.ILGenerator.DeclareLocal(typeof(ApplicationTransaction));
+
+                if (!Operator.ShouldTranslate)
+                {
+                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                    plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock1", BindingFlags.Static | BindingFlags.Public));
+                    plan.ILGenerator.Emit(OpCodes.Stloc, transaction);
+                }
+                else
+                {
+                    plan.ILGenerator.Emit(OpCodes.Ldnull);
+                    plan.ILGenerator.Emit(OpCodes.Stloc, transaction);
+                }
+
+                plan.ILGenerator.BeginExceptionBlock();
+                {
+                    plan.ILGenerator.Emit(OpCodes.Ldloc, transaction);
+                    plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock2", BindingFlags.Static | BindingFlags.Public));
+
+                    plan.ILGenerator.BeginExceptionBlock();
+                    {
+                        // Prepare the result
+//                        if (_allocateResultNode != null)
+//                            _allocateResultNode.EmitIL(plan);
+
+                        // Record the stack depth
+//                        var stack = plan.ILGenerator.DeclareLocal(typeof(Stack));
+
+//                        plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+//                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
+//                        plan.ILGenerator.Emit(OpCodes.Stloc, stack);
+
+//                        var stackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
+
+                        // int stackDepth = program.Stack.Count;
+//                        plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+//                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
+//                        plan.ILGenerator.Emit(OpCodes.Stloc, stackDepth);
+
+                        plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                        plan.ILGenerator.Emit(OpCodes.Call, Operator.Block.CompiledBlockNode);
+
+                        // TODO: Pass any var arguments back out to the instruction
+//                        for (int index = 0; index < Operator.Operands.Count; index++)
+//                            if (Operator.Operands[index].Modifier == Modifier.Var)
+//                                arguments[index] = program.Stack[program.Stack.Count - stackDepth + (Operator.Operands.Count + (_allocateResultNode != null ? 1 : 0) - 1 - index)];
+
+                        // Return the result
+                        if (_allocateResultNode != null)
+                        {
+                            /*
+                            var retType = ((VariableNode)_allocateResultNode).VariableNativeType();
+                            var newStackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
+
+                            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+                            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
+                            plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
+
+                            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+                            plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
+                            plan.ILGenerator.Emit(OpCodes.Ldloc, stackDepth);
+                            plan.ILGenerator.Emit(OpCodes.Sub);
+                            plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
+
+                            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+                            plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
+                            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Peek"));
+
+                            // unbox
+                            if (retType.IsValueType)
+                            {
+                                var hostType = retType.GetGenericArguments()[0];
+
+                                plan.ILGenerator.Emit(OpCodes.Call, typeof(StackReferenceNode).GetMethod("UnboxNullableObject").MakeGenericMethod(hostType));
+                            }
+                            else
+                                plan.ILGenerator.Emit(OpCodes.Castclass, retType);*/
+
+                            plan.ILGenerator.Emit(OpCodes.Stloc, resultLocal);
+                        }
+                    }
+                    plan.ILGenerator.BeginFinallyBlock();
+                    {
+                        plan.ILGenerator.Emit(OpCodes.Ldloc, transaction);
+                        plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock2_Undo", BindingFlags.Static | BindingFlags.Public));
+                    }
+                    plan.ILGenerator.EndExceptionBlock();
+                }
+                plan.ILGenerator.BeginFinallyBlock();
+                {
+                    plan.ILGenerator.Emit(OpCodes.Ldloc, transaction);
+                    plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock1_Undo", BindingFlags.Static | BindingFlags.Public));
+                }
+                plan.ILGenerator.EndExceptionBlock();
+            }
+            plan.ILGenerator.BeginFinallyBlock();
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                plan.ILGenerator.Emit(OpCodes.Ldloc, saveIsInsert);
+                plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock0_Undo", BindingFlags.Static | BindingFlags.Public));
+            }
+            plan.ILGenerator.EndExceptionBlock();
+
+            if (_allocateResultNode != null)
+            {
+                plan.ILGenerator.Emit(OpCodes.Ldloc, resultLocal);
+            }
+        }
+
+        public override Type ILNativeType()
+        {
+            if (Operator.Block.CompiledBlockNode == null)
+            {
+                // TODO: re-factor, this is the same as InstructionNodeBase.ILNativeType()
+                var types = new Type[NodeCount];
+                for (int i = 0; i < NodeCount; i++)
+                    types[i] = Nodes[i].ILNativeType();
+                var mth = Operator.Block.BlockNode.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, types, null);
+                if (mth == null)
+                {
+                    // try the fallback
+                    var newtypes = new Type[NodeCount + 1];
+                    newtypes[0] = typeof(Program);
+                    for (int i = 0; i < NodeCount; i++)
+                        newtypes[i + 1] = types[i];
+                    mth = Operator.Block.BlockNode.GetType().GetMethod("InternalExecute", BindingFlags.Public | BindingFlags.Static, null, newtypes, null);
+                }
+                if (mth == null)
+                    throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
+
+                return mth.ReturnType;
+            }
+
+            return Operator.Block.CompiledBlockNode.ReturnType;
+        }
+    }
+
+    public class VariableNode : PlanNode
 	{
 		public VariableNode() : base()
 		{
@@ -1958,7 +2223,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             return typeof(void);
         }
 
-        private Type VariableNativeType()
+        public Type VariableNativeType()
         {
             // TODO: reuse the code from ValueNode.ILNativeType()
             switch (VariableType.Name)

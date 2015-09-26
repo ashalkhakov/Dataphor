@@ -114,7 +114,15 @@ namespace Alphora.Dataphor.DAE.Schema
 			get { return _blockNode; }
 			set { _blockNode = value; }
         }
-     
+
+        // Dynamic Method (if the block node was successfully compiled to IL)
+        protected System.Reflection.Emit.DynamicMethod _compiledBlockNode;
+        public System.Reflection.Emit.DynamicMethod CompiledBlockNode
+        {
+            get { return _compiledBlockNode; }
+            set { _compiledBlockNode = value; }
+        }
+        
         public void EmitStatement(EmitMode mode, D4.OperatorBlock block)
         {
 			if (ClassDefinition != null)

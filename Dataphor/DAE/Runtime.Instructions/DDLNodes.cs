@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace Alphora.Dataphor.DAE.Runtime.Instructions
 {
@@ -616,6 +617,135 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			program.CatalogDeviceSession.CreateOperator(_createOperator);
 			return null;
 		}
+
+        public override void EmitIL(Plan plan)
+        {
+            var operatorValue = _createOperator;
+            if (operatorValue.Block.BlockNode == null)
+                throw new CompilerException(CompilerException.Codes.CompilerMessage, "Compiling non-interpreted operators unsupported!");
+
+            var saveDynamicMethod = plan.DynamicMethod;
+            plan.Symbols.PushWindow(0);
+            try
+            {
+                var argTypes = new Type[] { typeof(Program) };
+                Type retType = null;
+
+                if (operatorValue.ReturnDataType != null)
+                {
+                    var tmp = new ValueNode(operatorValue.ReturnDataType, null);
+                    retType = tmp.ILNativeType();
+                }
+                else
+                {
+                    retType = typeof(void);
+                }
+                plan.DynamicMethod = new DynamicMethod(operatorValue.OperatorName, retType, argTypes);
+
+                Schema.Operand operand;
+                for (int index = 0; index < operatorValue.Operands.Count; index++)
+                {
+                    operand = operatorValue.Operands[index];
+                    plan.Symbols.Push(new Symbol(operand.Name, operand.DataType, operand.Modifier == Modifier.Const));
+                }
+
+                VariableNode allocateResultNode = null;
+                if (operatorValue.ReturnDataType != null)
+                {
+                    plan.Symbols.Push(new Symbol(Keywords.Result, operatorValue.ReturnDataType));
+                    allocateResultNode = new VariableNode(Keywords.Result, operatorValue.ReturnDataType);
+                }
+
+                //
+                // Prepare the result
+                var stack = plan.ILGenerator.DeclareLocal(typeof(Stack));
+                var stackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
+
+                if (allocateResultNode != null)
+                {
+                    allocateResultNode.EmitIL(plan);
+
+                    // Record the stack depth
+                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                    plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
+                    plan.ILGenerator.Emit(OpCodes.Stloc, stack);
+
+                    // int stackDepth = program.Stack.Count;
+                    plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+                    plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
+                    plan.ILGenerator.Emit(OpCodes.Stloc, stackDepth);
+                }
+                //
+
+                // emit the body
+                operatorValue.Block.BlockNode.EmitIL(plan);
+
+                // emit the epilogue
+                if (retType == typeof(void))
+                {
+//                    plan.ILGenerator.Emit(OpCodes.Ldnull);
+                }
+                else
+                {
+                    // Return the result
+                    if (allocateResultNode != null)
+                    {
+                        var newStackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
+
+                        plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
+                        plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
+
+                        plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
+                        plan.ILGenerator.Emit(OpCodes.Ldloc, stackDepth);
+                        plan.ILGenerator.Emit(OpCodes.Sub);
+                        plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
+
+                        plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
+                        plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
+                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Peek"));
+
+                        // unbox
+                        if (retType.IsValueType)
+                        {
+                            var hostType = retType.GetGenericArguments()[0];
+
+                            plan.ILGenerator.Emit(OpCodes.Call, typeof(StackReferenceNode).GetMethod("UnboxNullableObject").MakeGenericMethod(hostType));
+                        }
+                        else
+                            plan.ILGenerator.Emit(OpCodes.Castclass, retType);
+                    }
+                }
+                plan.ILGenerator.Emit(OpCodes.Ret);
+
+                operatorValue.Block.CompiledBlockNode = plan.DynamicMethod;
+            }
+            finally
+            {
+                plan.DynamicMethod = saveDynamicMethod;
+                plan.Symbols.PopWindow();
+            }
+
+            // now emit a call to execute...
+            // emit non-sensical stuff to abort IL execution
+            // TODO: figure out how to call the Execute method of an arbitrary node
+            plan.ILGenerator.Emit(OpCodes.Add);
+            /*
+            var id = plan.AllocateDeferredAction(this);
+
+            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Plan").GetGetMethod());
+            plan.ILGenerator.Emit(OpCodes.Ldc_I4, id);
+            plan.ILGenerator.Emit(OpCodes.Call, typeof(Plan).GetMethod("UseDeferredAction"));
+
+            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+            plan.ILGenerator.Emit(OpCodes.Call, typeof(PlanNode).GetMethod("Execute"));*/
+        }
+
+        public override Type ILNativeType()
+        {
+            return typeof(void);
+        }
     }
     
     public class CreateConstraintNode : CreateObjectNode
@@ -2344,7 +2474,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				program.Plan.PushCreationObject(tempOperator);
 				try
 				{
-					tempOperator.Block.BlockNode = Compiler.CompileOperatorBlock(program.Plan, operatorValue, _alterOperatorStatement.Block.Block);
+                    if (program.Plan.ShouldEmitIL)
+                    {
+                        // prepare dynamic method
+
+                        var argTypes = new Type[] { typeof(Program) };
+                        var retType = typeof(object);
+
+                        program.Plan.DynamicMethod = new System.Reflection.Emit.DynamicMethod(operatorValue.MangledName, retType, argTypes);
+                    }
+                    tempOperator.Block.BlockNode = Compiler.CompileOperatorBlock(program.Plan, operatorValue, _alterOperatorStatement.Block.Block);
+                    if (program.Plan.ShouldEmitIL && program.Plan.DynamicMethod != null)
+                    {
+                        tempOperator.Block.CompiledBlockNode = program.Plan.DynamicMethod;
+                    }
 					
 					program.CatalogDeviceSession.AlterOperator(operatorValue, tempOperator);
 				}

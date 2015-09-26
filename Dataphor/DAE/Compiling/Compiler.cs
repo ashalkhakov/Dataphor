@@ -695,12 +695,25 @@ namespace Alphora.Dataphor.DAE.Compiling
 			{
 				long startSubTicks = TimingUtility.CurrentTicks;
                 //node = ChunkNode(plan, node);
-                if (plan.ShouldEmitIL)
-                    node.StartEmitIL(plan);
 				node = OptimizeNode(plan, node);
-                if (plan.ShouldEmitIL)
-                    node.FinishEmitIL(plan);
-				plan.Statistics.OptimizeTime = new TimeSpan((long)((((double)(TimingUtility.CurrentTicks - startSubTicks)) / TimingUtility.TicksPerSecond) * TimeSpan.TicksPerSecond));
+
+                // determine if it should be compiled to IL
+                try
+                {
+                    if (plan.ShouldEmitIL)
+                    {
+                        node.StartEmitIL(plan);
+                        node.EmitIL(plan);
+                        node.FinishEmitIL(plan);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    plan.DynamicMethod = null; // can't allow this to cause errors in the future
+                    plan.Messages.Add(new CompilerException(CompilerException.Codes.NonFatalErrors, CompilerErrorLevel.Warning, exception));
+                }
+
+                plan.Statistics.OptimizeTime = new TimeSpan((long)((((double)(TimingUtility.CurrentTicks - startSubTicks)) / TimingUtility.TicksPerSecond) * TimeSpan.TicksPerSecond));
 				//startSubTicks = TimingUtility.CurrentTicks;
 				//node = Bind(plan, node);
 				//plan.Statistics.BindingTime = new TimeSpan((long)((((double)(TimingUtility.CurrentTicks - startSubTicks)) / TimingUtility.TicksPerSecond) * TimeSpan.TicksPerSecond));
@@ -773,17 +786,6 @@ namespace Alphora.Dataphor.DAE.Compiling
 #else
 					BindingTraversal(plan, planNode, new DetermineAccessPathVisitor());
 #endif
-
-                    // determine if it should be compiled to IL
-                    try
-                    {
-                        if (plan.ShouldEmitIL)
-                            planNode.EmitIL(plan);
-                    }
-                    catch (Exception exception)
-                    {
-                        plan.Messages.Add(new CompilerException(CompilerException.Codes.NonFatalErrors, CompilerErrorLevel.Warning, exception));
-                    }
                 }
             }
 			catch (Exception exception)
@@ -5094,7 +5096,7 @@ namespace Alphora.Dataphor.DAE.Compiling
 
 						plan.AttachDependency(plan.DataTypes.SystemBoolean);
 						plan.AttachDependency(scalarType);
-						
+
 						if (componentOperator.Block.ClassDefinition != null)
 							operatorValue.Block.ClassDefinition = (ClassDefinition)componentOperator.Block.ClassDefinition;
 						else
@@ -5130,7 +5132,7 @@ namespace Alphora.Dataphor.DAE.Compiling
 
 						plan.AttachDependency(plan.DataTypes.SystemInteger);
 						plan.AttachDependency(scalarType);
-						
+
 						if (componentOperator.Block.ClassDefinition != null)
 							operatorValue.Block.ClassDefinition = (ClassDefinition)componentOperator.Block.ClassDefinition;
 						else

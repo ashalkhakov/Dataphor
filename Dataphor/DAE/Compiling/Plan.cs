@@ -899,6 +899,12 @@ namespace Alphora.Dataphor.DAE.Compiling
 
         #region IL Emission
         private System.Reflection.Emit.DynamicMethod _dynamicMethod = null;
+        public System.Reflection.Emit.DynamicMethod DynamicMethod
+        {
+            get { return _dynamicMethod; }
+            set { _dynamicMethod = value; }
+        }
+
         public System.Reflection.Emit.ILGenerator ILGenerator
         {
             get
@@ -916,7 +922,7 @@ namespace Alphora.Dataphor.DAE.Compiling
                 return _dynamicMethod.GetILGenerator();
             }
         }
-        public Func<Program,object> CreateDynamicMethod()
+        public Func<Program,object> CreateDynamicMethodDelegate()
         {
             return (Func<Program, object>)_dynamicMethod.CreateDelegate(typeof(Func<Program, object>));
         }
