@@ -1032,19 +1032,48 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return argument1 == null;
 		}
 
-        public static bool? InternalExecute<T>(Nullable<T> argument1) where T : struct
-        {
-            return !argument1.HasValue;
-        }
+		public override void EmitIL(Plan plan)
+		{
+			var retType = ILNativeType();
+			var tempValue = plan.ILGenerator.DeclareLocal(retType);
+			var L0 = plan.ILGenerator.DefineLabel();
+			var L1 = plan.ILGenerator.DefineLabel();
 
-        public static bool? InternalExecute(object argument1)
-        {
-            return argument1 == null;
-        }
-    }
+			Nodes[0].EmitIL(plan);
+			plan.ILGenerator.Emit(OpCodes.Stloc, tempValue);
 
-    // operator IsNil(AValue : row, AColumnName : System.String) : Boolean;
-    public class IsNilRowNode : BinaryInstructionNode
+			if (retType.IsValueType)
+			{
+				plan.ILGenerator.Emit(OpCodes.Ldloca, tempValue);
+				plan.ILGenerator.Emit(OpCodes.Call, retType.GetProperty("HasValue").GetGetMethod());
+				plan.ILGenerator.Emit(OpCodes.Brfalse, L0);
+			}
+			else
+			{
+				plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
+				plan.ILGenerator.Emit(OpCodes.Ldnull);
+				plan.ILGenerator.Emit(OpCodes.Ceq);
+				plan.ILGenerator.Emit(OpCodes.Brtrue, L0);
+			}
+			// do the job for the true branch
+			plan.ILGenerator.Emit(OpCodes.Ldc_I4, 0); // not nil
+			plan.ILGenerator.Emit(OpCodes.Br, L1);
+			plan.ILGenerator.MarkLabel(L0);
+			// do the job for the false branch
+			plan.ILGenerator.Emit(OpCodes.Ldc_I4, 1); // nil
+
+			plan.ILGenerator.MarkLabel(L1);
+			plan.ILGenerator.Emit(OpCodes.Newobj, typeof(Nullable<bool>).GetConstructor(new Type[] { typeof(bool) }));
+		}
+
+		public override Type ILNativeType()
+		{
+			return typeof(bool?);
+		}
+	}
+
+	// operator IsNil(AValue : row, AColumnName : System.String) : Boolean;
+	public class IsNilRowNode : BinaryInstructionNode
 	{
 		public override void DetermineCharacteristics(Plan plan)
 		{
@@ -1077,19 +1106,48 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			return !(argument1 == null);
 		}
 
-        public static bool? InternalExecute<T>(Nullable<T> argument1) where T : struct
-        {
-            return argument1.HasValue;
-        }
+		public override void EmitIL(Plan plan)
+		{
+			var retType = ILNativeType();
+			var tempValue = plan.ILGenerator.DeclareLocal(retType);
+			var L0 = plan.ILGenerator.DefineLabel();
+			var L1 = plan.ILGenerator.DefineLabel();
 
-        public static bool? InternalExecute(object argument1)
-        {
-            return argument1 != null;
-        }
-    }
+			Nodes[0].EmitIL(plan);
+			plan.ILGenerator.Emit(OpCodes.Stloc, tempValue);
 
-    // operator IsNotNil(AValue : row, AColumnName : System.String) : Boolean;
-    public class IsNotNilRowNode : BinaryInstructionNode
+			if (retType.IsValueType)
+			{
+				plan.ILGenerator.Emit(OpCodes.Ldloca, tempValue);
+				plan.ILGenerator.Emit(OpCodes.Call, retType.GetProperty("HasValue").GetGetMethod());
+				plan.ILGenerator.Emit(OpCodes.Brfalse, L0);
+			}
+			else
+			{
+				plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
+				plan.ILGenerator.Emit(OpCodes.Ldnull);
+				plan.ILGenerator.Emit(OpCodes.Ceq);
+				plan.ILGenerator.Emit(OpCodes.Brtrue, L0);
+			}
+			// do the job for the true branch
+			plan.ILGenerator.Emit(OpCodes.Ldc_I4, 1); // nil
+			plan.ILGenerator.Emit(OpCodes.Br, L1);
+			plan.ILGenerator.MarkLabel(L0);
+			// do the job for the false branch
+			plan.ILGenerator.Emit(OpCodes.Ldc_I4, 0); // not nil
+
+			plan.ILGenerator.MarkLabel(L1);
+			plan.ILGenerator.Emit(OpCodes.Newobj, typeof(Nullable<bool>).GetConstructor(new Type[] { typeof(bool) }));
+		}
+
+		public override Type ILNativeType()
+		{
+			return typeof(bool?);
+		}
+	}
+
+	// operator IsNotNil(AValue : row, AColumnName : System.String) : Boolean;
+	public class IsNotNilRowNode : BinaryInstructionNode
 	{
 		public override void DetermineCharacteristics(Plan plan)
 		{
@@ -1192,13 +1250,14 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             plan.ILGenerator.MarkLabel(L0);
             // do the job for the false branch
             Nodes[1].EmitIL(plan);
-            plan.ILGenerator.MarkLabel(L1);
+
+			plan.ILGenerator.MarkLabel(L1);
             plan.ILGenerator.Emit(OpCodes.Nop); // just to mark the label
         }
 
         public override Type ILNativeType()
         {
-            return Nodes[0].ILNativeType();
+            return typeof(bool?);
         }
     }
 

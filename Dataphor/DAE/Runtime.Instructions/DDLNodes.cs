@@ -675,13 +675,24 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                     plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
                     plan.ILGenerator.Emit(OpCodes.Stloc, stackDepth);
                 }
-                //
+				//
 
-                // emit the body
-                operatorValue.Block.BlockNode.EmitIL(plan);
+				var saveLabel = plan.ExitLabel;
+				plan.ExitLabel = plan.ILGenerator.DefineLabel();
 
-                // emit the epilogue
-                if (retType == typeof(void))
+				// emit the body
+				try {
+					operatorValue.Block.BlockNode.EmitIL(plan);
+				}
+				finally
+				{
+					plan.ExitLabel = saveLabel;
+				}
+
+				plan.ILGenerator.MarkLabel(plan.ExitLabel);
+
+				// emit the epilogue
+				if (retType == typeof(void))
                 {
 //                    plan.ILGenerator.Emit(OpCodes.Ldnull);
                 }

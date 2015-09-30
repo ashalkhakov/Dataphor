@@ -360,7 +360,7 @@ namespace Alphora.Dataphor.DAE.Runtime
                     }
                     catch (InvalidProgramException ex)
                     {
-                        // until we find out how to compile CallNode...
+                        // until we find out how to compile DDL nodes...
                         result = _code.Execute(this);
                     }
                 }

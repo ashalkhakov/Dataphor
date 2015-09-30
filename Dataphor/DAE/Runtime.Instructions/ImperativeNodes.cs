@@ -159,12 +159,17 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
             plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("PushFrame", Type.EmptyTypes));
 
-            plan.ILGenerator.BeginExceptionBlock();
-
-            Nodes[0].EmitIL(plan);
-
-            plan.ILGenerator.BeginFinallyBlock();
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+			var Le = plan.ILGenerator.BeginExceptionBlock();
+            plan.PushExceptionContext(new ExceptionContext(Le));
+			try {
+				Nodes[0].EmitIL(plan);
+			}
+			finally
+			{
+				plan.PopExceptionContext();
+			}
+			plan.ILGenerator.BeginFinallyBlock();
+			plan.ILGenerator.Emit(OpCodes.Ldarg_0);
             plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
             plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("PopFrame"));
             plan.ILGenerator.EndExceptionBlock();
@@ -259,17 +264,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
         public override void EmitIL(Plan plan)
         {
-            // TODO:
-            // - if in protected block (try or catch or finally), then emit "leave"
-            //   - another context, this time Exception context
-            // - otherwise, emit "ret"
-            // ensure that in both cases, the "result" variable is set???
-            // - in D4, caller allocates "result", then passes it by ref to the callee
-            // - in D4, callee sets the by-ref "result" variable
-            // - in C#, caller does not allocate anything
-            // - in C#, callee does not set anything, it must only ensure that stack is non-empty
-            //   on exiting
-            base.EmitIL(plan);
+			plan.ILGenerator.Emit(plan.InExceptionContext()? OpCodes.Leave : OpCodes.Br, plan.ExitLabel);
         }
 
         public override Type ILNativeType()
@@ -668,7 +663,8 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         {
             var _break = plan.LoopContext.Break;
 
-            plan.ILGenerator.Emit(OpCodes.Br, _break);
+			var code = plan.InExceptionContext()? OpCodes.Leave : OpCodes.Br;
+            plan.ILGenerator.Emit(code, _break);
         }
 
         public override Type ILNativeType()
@@ -703,7 +699,8 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         {
             var _continue = plan.LoopContext.Continue;
 
-            plan.ILGenerator.Emit(OpCodes.Br, _continue);
+			var code = plan.InExceptionContext() ? OpCodes.Leave : OpCodes.Br;
+			plan.ILGenerator.Emit(code, _continue);
         }
 
         public override Type ILNativeType()
@@ -1441,6 +1438,12 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 //                    return typeof(object);
                 case "System.Error":
                     return typeof(DataphorException);
+				case "System.Date":
+				case "System.DateTime":
+				case "System.Time":
+					return typeof(Nullable<DateTime>);
+				case "System.TimeSpan":
+					return typeof(Nullable<TimeSpan>);
                 default:
                     break;
             }
@@ -1560,6 +1563,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 }
                 makeNullable = false;
             }
+			// TODO
             else
                 // unsupported scalar type
                 throw new CompilerException(CompilerException.Codes.InvalidElementType, DataType.Name);
@@ -2243,8 +2247,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 case "System.Decimal":
                 case "System.Money":
                     return typeof(Nullable<decimal>);
-                //                case "System.Generic":
-                //                    return typeof(object);
+				case "System.Guid":
+					return typeof(Nullable<Guid>);
+				case "System.TimeSpan":
+					return typeof(Nullable<TimeSpan>);
+				case "System.Date":
+				case "System.DateTime":
+				case "System.Time":
+					return typeof(Nullable<DateTime>);
+				//                case "System.Generic":
+				//                    return typeof(object);
+				case "System.VersionNumber":
+					return typeof(Nullable<VersionNumber>);
                 default:
                     break;
             }
@@ -2975,8 +2989,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 case "System.Decimal":
                 case "System.Money":
                     return typeof(Nullable<decimal>);
-                //                case "System.Generic":
-                //                    return typeof(object);
+				case "System.Guid":
+					return typeof(Nullable<Guid>);
+				//                case "System.Generic":
+				//                    return typeof(object);
+				case "System.Date":
+				case "System.Time":
+				case "System.DateTime":
+					return typeof(Nullable<DateTime>);
+				case "System.TimeSpan":
+					return typeof(Nullable<TimeSpan>);
+				case "System.VersionNumber":
+					return typeof(Nullable<VersionNumber>);
                 default:
                     break;
             }

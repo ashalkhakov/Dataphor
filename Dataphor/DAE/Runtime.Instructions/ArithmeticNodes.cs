@@ -1981,7 +1981,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return (long)argument1 % (long)argument2;
 		}
 
-        public long? InternalExecute(long? argument1, long? argument2)
+        public static long? InternalExecute(long? argument1, long? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)

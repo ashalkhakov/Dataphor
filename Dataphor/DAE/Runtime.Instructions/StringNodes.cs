@@ -9,6 +9,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
+using System.Reflection.Emit;
 
 namespace Alphora.Dataphor.DAE.Runtime.Instructions
 {
@@ -17,6 +18,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 	using Schema = Alphora.Dataphor.DAE.Schema;
 	using Alphora.Dataphor.DAE.Runtime;
 	using Alphora.Dataphor.DAE.Runtime.Data;
+	using Compiling;
 
 	// operator iIndexer(const AString : string, const AIndex : integer) : string
 	public class StringIndexerNode : BinaryInstructionNode
@@ -1297,7 +1299,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 		
-		protected string TransformString(string input)
+		protected static string TransformString(string input)
 		{
 			IList regexChars = (IList)new char[]{'.', '$', '{', '[', '(', '|', ')', '*', '+', '?'};
 			StringBuilder result = new StringBuilder();
@@ -1352,7 +1354,22 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			Match match = regex.Match(stringValue);
 			return match.Success && (match.Index == 0);
 		}
-    }
+
+		// TODO: evaluate the second argument if it is literal
+		public static bool? InternalExecute(string argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			string stringValue = (string)argument1;
+			string pattern = TransformString((string)argument2);
+			Regex regex = GetRegex(pattern);
+			Match match = regex.Match(stringValue);
+			return match.Success && (match.Index == 0);
+		}
+	}
 	
 	#if USEISTRING
 	public class IStringLikeNode : StringLikeNodeBase
@@ -1384,23 +1401,34 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
 			return StringLikeNodeBase.GetRegex((string)argument2).IsMatch((string)argument1);
 		}
+
+		// TODO: evaluate the second argument at compile time if it is literal
+		public static bool? InternalExecute(string argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return StringLikeNodeBase.GetRegex((string)argument2).IsMatch((string)argument1);
+		}
 	}
-	
-	#if USEISTRING
+
+#if USEISTRING
 	public class IStringMatchesNode : BinaryInstructionNode
 	{
 		public override object InternalExecute(Program AProgram, object AArgument1, object AArgument2)
 		{
-			#if NILPROPOGATION
+#if NILPROPOGATION
 			if (AArgument1 == null || AArgument2 == null)
 				return null;
-			#endif
+#endif
 
 			return Regex.IsMatch((string)AArgument1, (string)AArgument2, RegexOptions.IgnoreCase);
 		}
 	}
-	#endif
-	
+#endif
+
 	// operator CompareText(string, string) : integer
 	public class StringCompareTextNode : BinaryInstructionNode
 	{

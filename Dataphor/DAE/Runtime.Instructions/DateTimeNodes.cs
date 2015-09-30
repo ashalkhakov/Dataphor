@@ -2508,7 +2508,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             else
 #endif
             {
-                long ticks = DateTime.Parse((String)argument).Ticks;
+                long ticks = DateTime.Parse((String)argument, System.Globalization.CultureInfo.GetCultureInfo("en-us")).Ticks;
                 return new DateTime(ticks - (ticks % TimeSpan.TicksPerSecond));
             }
         }
@@ -2534,7 +2534,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return DateTime.Parse((String)argument).Date;
+                return DateTime.Parse((String)argument, System.Globalization.CultureInfo.GetCultureInfo("en-us")).Date;
         }
     }
 
@@ -2562,7 +2562,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             else
 #endif
             {
-                long ticks = DateTime.Parse("1/1/0001 " + (String)argument).Ticks;
+                long ticks = DateTime.Parse("1/1/0001 " + (String)argument, System.Globalization.CultureInfo.GetCultureInfo("en-us")).Ticks;
                 return new DateTime(ticks - (ticks % TimeSpan.TicksPerSecond));
             }
         }
@@ -2612,7 +2612,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return ((DateTime)argument).ToString("G");
+                return ((DateTime)argument).ToString("G", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
         }
     }
 
@@ -2636,7 +2636,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return ((DateTime)argument).ToString("T");
+                return ((DateTime)argument).ToString("T", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
         }
     }
 
@@ -2660,7 +2660,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return ((DateTime)argument).ToString("d");
+                return ((DateTime)argument).ToString("d", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
         }
     }
 
