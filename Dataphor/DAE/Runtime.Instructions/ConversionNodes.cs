@@ -159,7 +159,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return Convert.ToByte((string)argument1);
 		}
 
-        public byte? InternalExecute(string argument1)
+        public static byte? InternalExecute(string argument1)
         {
 #if NILPROPOGATION
             if (argument1 == null)
@@ -2454,7 +2454,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return ((decimal)argument1).ToString("0.#############################");
+                return ((decimal)argument1).ToString("0.#############################", System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
         }
     }
 
@@ -2478,7 +2478,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return ((decimal)argument1).ToString("C");
+                return ((decimal)argument1).ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-us"));
         }
     }
 
@@ -2502,7 +2502,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return Convert.ToDecimal((string)argument1);
+                return Convert.ToDecimal((string)argument1, System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
         }
     }
 
@@ -2516,7 +2516,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 				return null;
 			else
 			#endif
-				return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency);
+				return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency, System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
 		}
 
         public static decimal? InternalExecute(string argument1)
@@ -2526,7 +2526,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return null;
             else
 #endif
-                return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency);
+                return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency, System.Globalization.CultureInfo.GetCultureInfo("en-us").NumberFormat);
         }
     }
 

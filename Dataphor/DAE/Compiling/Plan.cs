@@ -496,12 +496,20 @@ namespace Alphora.Dataphor.DAE.Compiling
             _exceptionContexts.Add(context);
         }
 
+		public bool InExceptionContext()
+		{
+			return _exceptionContexts.Count > 0;
+		}
+
         public void PopExceptionContext()
         {
             _exceptionContexts.RemoveAt(_exceptionContexts.Count - 1);
         }
 
         public ExceptionContext ExceptionContext { get { return _exceptionContexts[_exceptionContexts.Count - 1]; } }
+
+		// Only for use during operator body compilation
+		public System.Reflection.Emit.Label ExitLabel { get; set; }
 
         // A Temporary catalog where catalog objects are registered during compilation
         protected Schema.Catalog _planCatalog;

@@ -2288,7 +2288,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			}
 		}
 
-        public int? InternalExecute(decimal? argument1, decimal? argument2)
+        public static int? InternalExecute(decimal? argument1, decimal? argument2)
         {
 #if NILPROPOGATION
             if (argument1 == null || argument2 == null)

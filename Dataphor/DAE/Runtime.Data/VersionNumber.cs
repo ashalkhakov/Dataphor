@@ -345,8 +345,50 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 					arguments.Length > 3 ? (int)arguments[3] : -1
 				);
 		}
+
+		// operator VersionNumber(AMajor : Integer, AMinor : Integer, ARevision : Integer) : VersionNumber;	
+		// operator VersionNumber(AMajor : Integer, AMinor : Integer, ARevision : Integer, ABuild : Integer) : VersionNumber;
+		public static VersionNumber? InternalExecute(int? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return new VersionNumber((int)argument1, -1, -1, -1);
+		}
+
+		public static VersionNumber? InternalExecute(int? argument1, int? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return new VersionNumber((int)argument1, (int)argument2, -1, -1);
+		}
+
+		public static VersionNumber? InternalExecute(int? argument1, int? argument2, int? argument3)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null || argument3 == null)
+				return null;
+#endif
+
+			return new VersionNumber((int)argument1, (int)argument2, (int)argument3, -1);
+		}
+
+		public static VersionNumber? InternalExecute(int? argument1, int? argument2, int? argument3, int? argument4)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null || argument3 == null || argument4 == null)
+				return null;
+#endif
+
+			return new VersionNumber((int)argument1, (int)argument2, (int)argument3, (int)argument4);
+		}
 	}
-	
+
 	// operator VersionNumber.ReadMajor(AValue : VersionNumber) : Integer;
 	public class VersionNumberMajorReadAccessorNode : InstructionNode
 	{
@@ -359,8 +401,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return ((VersionNumber)arguments[0]).Major;
 		}
+
+		public static int? InternalExecute(VersionNumber? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return ((VersionNumber)argument1).Major;
+		}
 	}
-	
+
 	// operator VersionNumber.WriteMajor(AValue : VersionNumber, AMajor : Integer) : VersionNumber;
 	public class VersionNumberMajorWriteAccessorNode : InstructionNode
 	{
@@ -373,6 +425,17 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			VersionNumber tempValue = (VersionNumber)arguments[0];
 			return new VersionNumber((int)arguments[1], tempValue.Minor, tempValue.Revision, tempValue.Build);
+		}
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, int? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			VersionNumber tempValue = (VersionNumber)argument1;
+			return new VersionNumber((int)argument2, tempValue.Minor, tempValue.Revision, tempValue.Build);
 		}
 	}
 
@@ -388,8 +451,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return ((VersionNumber)arguments[0]).Minor;
 		}
+
+		public static int? InternalExecute(VersionNumber? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return ((VersionNumber)argument1).Minor;
+		}
 	}
-	
+
 	// operator VersionNumber.WriteMinor(AValue : VersionNumber, AMinor : Integer) : VersionNumber;
 	public class VersionNumberMinorWriteAccessorNode : InstructionNode
 	{
@@ -402,6 +475,17 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			VersionNumber tempValue = (VersionNumber)arguments[0];
 			return new VersionNumber(tempValue.Major, (int)arguments[1], tempValue.Revision, tempValue.Build);
+		}
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, int? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			VersionNumber tempValue = (VersionNumber)argument1;
+			return new VersionNumber(tempValue.Major, (int)argument2, tempValue.Revision, tempValue.Build);
 		}
 	}
 
@@ -417,8 +501,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return ((VersionNumber)arguments[0]).Revision;
 		}
+
+		public static int? InternalExecute(VersionNumber? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return ((VersionNumber)argument1).Revision;
+		}
 	}
-	
+
 	// operator VersionNumber.WriteRevision(AValue : VersionNumber, ARevision : Integer) : VersionNumber;
 	public class VersionNumberRevisionWriteAccessorNode : InstructionNode
 	{
@@ -431,6 +525,17 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			VersionNumber tempValue = (VersionNumber)arguments[0];
 			return new VersionNumber(tempValue.Major, tempValue.Minor, (int)arguments[1], tempValue.Build);
+		}
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, int? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			VersionNumber tempValue = (VersionNumber)argument1;
+			return new VersionNumber(tempValue.Major, tempValue.Minor, (int)argument2, tempValue.Build);
 		}
 	}
 
@@ -446,8 +551,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return ((VersionNumber)arguments[0]).Build;
 		}
+
+		public static int? InternalExecute(VersionNumber? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return ((VersionNumber)argument1).Build;
+		}
 	}
-	
+
 	// operator VersionNumber.WriteBuild(AValue : VersionNumber, ABuild : Integer) : VersionNumber;
 	public class VersionNumberBuildWriteAccessorNode : InstructionNode
 	{
@@ -461,10 +576,21 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			VersionNumber tempValue = (VersionNumber)arguments[0];
 			return new VersionNumber(tempValue.Major, tempValue.Minor, tempValue.Revision, (int)arguments[1]);
 		}
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, int? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			VersionNumber tempValue = (VersionNumber)argument1;
+			return new VersionNumber(tempValue.Major, tempValue.Minor, tempValue.Revision, (int)argument2);
+		}
 	}
-	
-    // VersionNumberAsStringSelectorNode
-    public class VersionNumberAsStringSelectorNode : InstructionNode
+
+	// VersionNumberAsStringSelectorNode
+	public class VersionNumberAsStringSelectorNode : InstructionNode
     {
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -475,10 +601,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return VersionNumber.Parse((string)arguments[0]);
 		}
-    }
-    
-    // VersionNumberAsStringReadAccessorNode
-    public class VersionNumberAsStringReadAccessorNode : InstructionNode
+
+		public static VersionNumber? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return VersionNumber.Parse((string)argument1);
+		}
+	}
+
+	// VersionNumberAsStringReadAccessorNode
+	public class VersionNumberAsStringReadAccessorNode : InstructionNode
     {
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -489,10 +625,20 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return ((VersionNumber)arguments[0]).ToString();
 		}
-    }
-    
-    // VersionNumberAsStringWriteAccessorNode
-    public class VersionNumberAsStringWriteAccessorNode : InstructionNode
+
+		public static string InternalExecute(VersionNumber? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return ((VersionNumber)argument1).ToString();
+		}
+	}
+
+	// VersionNumberAsStringWriteAccessorNode
+	public class VersionNumberAsStringWriteAccessorNode : InstructionNode
     {
 		public override object InternalExecute(Program program, object[] arguments)
 		{
@@ -503,7 +649,17 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return VersionNumber.Parse((string)arguments[1]);
 		}
-    }   
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+
+			return VersionNumber.Parse((string)argument2);
+		}
+	}
 
 	// operator iCompare(ALeftValue : VersionNumber, ARightValue : VersionNumber) : Integer
 	public class VersionNumberCompareNode : InstructionNode
@@ -516,6 +672,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			#endif
 			
 			return VersionNumber.Compare((VersionNumber)arguments[0], (VersionNumber)arguments[1]);
+		}
+
+		public static int? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return VersionNumber.Compare((VersionNumber)argument1, (VersionNumber)argument2);
 		}
 	}
 
@@ -535,6 +701,23 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			{
 				VersionNumber tempValue = (VersionNumber)arguments[0];
 				VersionNumber RValue = (VersionNumber)arguments[1];
+				return tempValue > RValue ? tempValue : RValue;
+			}
+		}
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+			if (argument1 == null)
+				if (argument2 == null)
+					return null;
+				else
+					return argument2;
+			else if (argument2 == null)
+				return argument1;
+			else
+			{
+				VersionNumber tempValue = (VersionNumber)argument1;
+				VersionNumber RValue = (VersionNumber)argument2;
 				return tempValue > RValue ? tempValue : RValue;
 			}
 		}
@@ -559,6 +742,23 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 				return tempValue < RValue ? tempValue : RValue;
 			}
 		}
+
+		public static VersionNumber? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+			if (argument1 == null)
+				if (argument2 == null)
+					return null;
+				else
+					return argument2;
+			else if (argument2 == null)
+				return argument1;
+			else
+			{
+				VersionNumber tempValue = (VersionNumber)argument1;
+				VersionNumber RValue = (VersionNumber)argument2;
+				return tempValue < RValue ? tempValue : RValue;
+			}
+		}
 	}
 
 	// create operator iEqual(const ALeftValue : VersionNumber, const ARightValue : VersionNumber) : Boolean
@@ -572,6 +772,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			#endif
 			
 			return (VersionNumber)arguments[0] == (VersionNumber)arguments[1];
+		}
+
+		public static bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return (VersionNumber)argument1 == (VersionNumber)argument2;
 		}
 	}
 
@@ -587,6 +797,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return (VersionNumber)arguments[0] != (VersionNumber)arguments[1];
 		}
+
+		public static bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return (VersionNumber)argument1 != (VersionNumber)argument2;
+		}
 	}
 
 	// create operator iLess(const ALeftValue : VersionNumber, const ARightValue : VersionNumber) : Boolean
@@ -600,6 +820,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			#endif
 			
 			return (VersionNumber)arguments[0] < (VersionNumber)arguments[1];
+		}
+
+		public static bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return (VersionNumber)argument1 < (VersionNumber)argument2;
 		}
 	}
 
@@ -615,6 +845,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return (VersionNumber)arguments[0] <= (VersionNumber)arguments[1];
 		}
+
+		public static bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return (VersionNumber)argument1 <= (VersionNumber)argument2;
+		}
 	}
 
 	// create operator iGreater(const ALeftValue : VersionNumber, const ARightValue : VersionNumber) : Boolean
@@ -628,6 +868,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			#endif
 			
 			return (VersionNumber)arguments[0] > (VersionNumber)arguments[1];
+		}
+
+		public static bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return (VersionNumber)argument1 > (VersionNumber)argument2;
 		}
 	}
 
@@ -643,6 +893,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return (VersionNumber)arguments[0] >= (VersionNumber)arguments[1];
 		}
+
+		public bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return (VersionNumber)argument1 >= (VersionNumber)argument2;
+		}
 	}
 
 	// operator Compatible(const ASource : VersionNumber, const ATarget : VersionNumber) : Boolean
@@ -657,8 +917,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			
 			return VersionNumber.Compatible((VersionNumber)arguments[0], (VersionNumber)arguments[1]);
 		}
+
+		public static bool? InternalExecute(VersionNumber? argument1, VersionNumber? argument2)
+		{
+#if NILPROPOGATION
+			if (argument1 == null || argument2 == null)
+				return null;
+#endif
+
+			return VersionNumber.Compatible((VersionNumber)argument1, (VersionNumber)argument2);
+		}
 	}
-	
+
 	// operator ToString(const AVersionNumber : VersionNumber) : String;
 	// operator ToIString(const AVersionNumber : VersionNumber) : IString;
 	public class VersionNumberToStringNode : InstructionNode
@@ -671,6 +941,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			#endif
 			
 			return ((VersionNumber)arguments[0]).ToString();
+		}
+
+		public static string InternalExecute(VersionNumber? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return ((VersionNumber)argument1).ToString();
 		}
 	}
 	
@@ -686,6 +966,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Data
 			#endif
 			
 			return VersionNumber.Parse((string)arguments[0]);
+		}
+
+		public static VersionNumber? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+
+			return VersionNumber.Parse((string)argument1);
 		}
 	}
 }
