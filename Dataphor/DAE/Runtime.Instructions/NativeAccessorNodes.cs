@@ -32,7 +32,16 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToBoolean((string)argument1);
 		}
-    }
+
+		public static bool? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToBoolean((string)argument1);
+		}
+	}
     
     // BooleanAsStringReadAccessorNode
     public class BooleanAsStringReadAccessorNode : UnaryInstructionNode
@@ -45,10 +54,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((bool)argument1).ToString().ToLower();
 		}
-    }
-    
-    // BooleanAsStringWriteAccessorNode
-    public class BooleanAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(bool? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((bool)argument1).ToString().ToLower();
+		}
+	}
+
+	// BooleanAsStringWriteAccessorNode
+	public class BooleanAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -58,10 +76,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToBoolean((string)argument2);
 		}
-    }   
 
-    // BooleanAsDisplayStringSelectorNode
-    public class BooleanAsDisplayStringSelectorNode : UnaryInstructionNode
+		public static bool? InternalExecute(bool? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToBoolean((string)argument2);
+		}
+	}
+
+	// BooleanAsDisplayStringSelectorNode
+	public class BooleanAsDisplayStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -71,10 +98,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToBoolean((string)argument1);
 		}
-    }
-    
-    // BooleanAsDisplayStringReadAccessorNode
-    public class BooleanAsDisplayStringReadAccessorNode : UnaryInstructionNode
+
+		public static bool? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToBoolean((string)argument1);
+		}
+	}
+
+	// BooleanAsDisplayStringReadAccessorNode
+	public class BooleanAsDisplayStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -84,10 +120,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((bool)argument1).ToString();
 		}
-    }
-    
-    // BooleanAsDisplayStringWriteAccessorNode
-    public class BooleanAsDisplayStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(bool? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((bool)argument1).ToString();
+		}
+	}
+
+	// BooleanAsDisplayStringWriteAccessorNode
+	public class BooleanAsDisplayStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -97,10 +142,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToBoolean((string)argument2);
 		}
-    }   
 
-    // ByteAsStringSelectorNode
-    public class ByteAsStringSelectorNode : UnaryInstructionNode
+		public static bool? InternalExecute(bool? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToBoolean((string)argument2);
+		}
+	}
+
+	// ByteAsStringSelectorNode
+	public class ByteAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -110,10 +164,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToByte((string)argument1);
 		}
-    }
-    
-    // ByteAsStringReadAccessorNode
-    public class ByteAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static byte? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToByte((string)argument1);
+		}
+	}
+
+	// ByteAsStringReadAccessorNode
+	public class ByteAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -123,10 +186,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((byte)argument1).ToString();
 		}
-    }
-    
-    // ByteAsStringWriteAccessorNode
-    public class ByteAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(byte? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((byte)argument1).ToString();
+		}
+	}
+
+	// ByteAsStringWriteAccessorNode
+	public class ByteAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -136,10 +208,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToByte((string)argument2);
 		}
-    }   
 
-    // ShortAsStringSelectorNode
-    public class ShortAsStringSelectorNode : UnaryInstructionNode
+		public static byte? InternalExecute(byte? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToByte((string)argument2);
+		}
+	}
+
+	// ShortAsStringSelectorNode
+	public class ShortAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -149,10 +230,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToInt16((string)argument1);
 		}
-    }
-    
-    // ShortAsStringReadAccessorNode
-    public class ShortAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static short? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToInt16((string)argument1);
+		}
+	}
+
+	// ShortAsStringReadAccessorNode
+	public class ShortAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -162,10 +252,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((short)argument1).ToString();
 		}
-    }
-    
-    // ShortAsStringWriteAccessorNode
-    public class ShortAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(short? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((short)argument1).ToString();
+		}
+	}
+
+	// ShortAsStringWriteAccessorNode
+	public class ShortAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -175,10 +274,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToInt16((string)argument2);
 		}
-    }   
 
-    // IntegerAsStringSelectorNode
-    public class IntegerAsStringSelectorNode : UnaryInstructionNode
+		public static short? InternalExecute(short? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToInt16((string)argument2);
+		}
+	}
+
+	// IntegerAsStringSelectorNode
+	public class IntegerAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -188,10 +296,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToInt32((string)argument1);
 		}
-    }
-    
-    // IntegerAsStringReadAccessorNode
-    public class IntegerAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static int? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToInt32((string)argument1);
+		}
+	}
+
+	// IntegerAsStringReadAccessorNode
+	public class IntegerAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -201,10 +318,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((int)argument1).ToString();
 		}
-    }
-    
-    // IntegerAsStringWriteAccessorNode
-    public class IntegerAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(int? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((int)argument1).ToString();
+		}
+	}
+
+	// IntegerAsStringWriteAccessorNode
+	public class IntegerAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -214,10 +340,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToInt32((string)argument2);
 		}
-    }   
 
-    // LongAsStringSelectorNode
-    public class LongAsStringSelectorNode : UnaryInstructionNode
+		public static int? InternalExecute(int? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToInt32((string)argument2);
+		}
+	}
+
+	// LongAsStringSelectorNode
+	public class LongAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -227,10 +362,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToInt64((string)argument1);
 		}
-    }
-    
-    // LongAsStringReadAccessorNode
-    public class LongAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static long? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToInt64((string)argument1);
+		}
+	}
+
+	// LongAsStringReadAccessorNode
+	public class LongAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -240,10 +384,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((long)argument1).ToString();
 		}
-    }
-    
-    // LongAsStringWriteAccessorNode
-    public class LongAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(long? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((long)argument1).ToString();
+		}
+	}
+
+	// LongAsStringWriteAccessorNode
+	public class LongAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -253,10 +406,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToInt64((string)argument2);
 		}
-    }   
 
-    // DecimalAsStringSelectorNode
-    public class DecimalAsStringSelectorNode : UnaryInstructionNode
+		public static long? InternalExecute(long? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToInt64((string)argument2);
+		}
+	}
+
+	// DecimalAsStringSelectorNode
+	public class DecimalAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -266,10 +428,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToDecimal((string)argument1);
 		}
-    }
-    
-    // DecimalAsStringReadAccessorNode
-    public class DecimalAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static decimal? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Convert.ToDecimal((string)argument1);
+		}
+	}
+
+	// DecimalAsStringReadAccessorNode
+	public class DecimalAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -279,10 +450,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((decimal)argument1).ToString();
 		}
-    }
-    
-    // DecimalAsStringWriteAccessorNode
-    public class DecimalAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(decimal? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((decimal)argument1).ToString();
+		}
+	}
+
+	// DecimalAsStringWriteAccessorNode
+	public class DecimalAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -292,10 +472,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Convert.ToDecimal((string)argument2);
 		}
-    }   
 
-    // GuidAsStringSelectorNode
-    public class GuidAsStringSelectorNode : UnaryInstructionNode
+		public static decimal? InternalExecute(decimal? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Convert.ToDecimal((string)argument2);
+		}
+	}
+
+	// GuidAsStringSelectorNode
+	public class GuidAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -305,10 +494,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return new Guid((string)argument1);
 		}
-    }
-    
-    // GuidAsStringReadAccessorNode
-    public class GuidAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static Guid? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return new Guid((string)argument1);
+		}
+	}
+
+	// GuidAsStringReadAccessorNode
+	public class GuidAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -318,10 +516,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((Guid)argument1).ToString();
 		}
-    }
-    
-    // GuidAsStringWriteAccessorNode
-    public class GuidAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(Guid? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((Guid)argument1).ToString();
+		}
+	}
+
+	// GuidAsStringWriteAccessorNode
+	public class GuidAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -331,10 +538,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return new Guid((string)argument2);
 		}
-    }   
 
-    // MoneyAsStringSelectorNode
-    public class MoneyAsStringSelectorNode : UnaryInstructionNode
+		public static Guid? InternalExecute(Guid? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return new Guid((string)argument2);
+		}
+	}
+
+	// MoneyAsStringSelectorNode
+	public class MoneyAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -344,10 +560,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency);
 		}
-    }
-    
-    // MoneyAsStringReadAccessorNode
-    public class MoneyAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static decimal? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Decimal.Parse((string)argument1, System.Globalization.NumberStyles.Currency);
+		}
+	}
+
+	// MoneyAsStringReadAccessorNode
+	public class MoneyAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -357,10 +582,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((decimal)argument1).ToString("F");
 		}
-    }
-    
-    // MoneyAsDisplayStringReadAccessorNode
-    public class MoneyAsDisplayStringReadAccessorNode : UnaryInstructionNode
+
+		public static string InternalExecute(decimal? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((decimal)argument1).ToString("F");
+		}
+	}
+
+	// MoneyAsDisplayStringReadAccessorNode
+	public class MoneyAsDisplayStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -370,10 +604,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((decimal)argument1).ToString("C");
 		}
-    }
-    
-    // MoneyAsStringWriteAccessorNode
-    public class MoneyAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(decimal? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((decimal)argument1).ToString("C");
+		}
+	}
+
+	// MoneyAsStringWriteAccessorNode
+	public class MoneyAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -383,10 +626,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Decimal.Parse((string)argument2, System.Globalization.NumberStyles.Currency);
 		}
-    }   
 
-    // DateTimeAsStringSelectorNode
-    public class DateTimeAsStringSelectorNode : UnaryInstructionNode
+		public static decimal? InternalExecute(decimal? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return Decimal.Parse((string)argument2, System.Globalization.NumberStyles.Currency);
+		}
+	}
+
+	// DateTimeAsStringSelectorNode
+	public class DateTimeAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -396,10 +648,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return DateTime.Parse((string)argument1);
 		}
-    }
-    
-    // DateTimeAsStringReadAccessorNode
-    public class DateTimeAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static DateTime? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return DateTime.Parse((string)argument1);
+		}
+	}
+
+	// DateTimeAsStringReadAccessorNode
+	public class DateTimeAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -409,10 +670,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((DateTime)argument1).ToString("G");
 		}
-    }
-    
-    // DateTimeAsStringWriteAccessorNode
-    public class DateTimeAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(DateTime? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((DateTime)argument1).ToString("G");
+		}
+	}
+
+	// DateTimeAsStringWriteAccessorNode
+	public class DateTimeAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -422,10 +692,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return DateTime.Parse((string)argument2);
 		}
-    }   
 
-    // DateAsStringSelectorNode
-    public class DateAsStringSelectorNode : UnaryInstructionNode
+		public static DateTime? InternalExecute(DateTime? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return DateTime.Parse((string)argument2);
+		}
+	}
+
+	// DateAsStringSelectorNode
+	public class DateAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -435,10 +714,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return DateTime.Parse((string)argument1).Date;
 		}
-    }
-    
-    // DateAsStringReadAccessorNode
-    public class DateAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static DateTime? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return DateTime.Parse((string)argument1).Date;
+		}
+	}
+
+	// DateAsStringReadAccessorNode
+	public class DateAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -448,10 +736,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((DateTime)argument1).ToString("d");
 		}
-    }
-    
-    // DateAsStringWriteAccessorNode
-    public class DateAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(DateTime? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((DateTime)argument1).ToString("d");
+		}
+	}
+
+	// DateAsStringWriteAccessorNode
+	public class DateAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -461,10 +758,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return DateTime.Parse((string)argument2).Date;
 		}
-    }   
 
-    // TimeSpanAsStringSelectorNode
-    public class TimeSpanAsStringSelectorNode : UnaryInstructionNode
+		public static DateTime? InternalExecute(DateTime? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return DateTime.Parse((string)argument2).Date;
+		}
+	}
+
+	// TimeSpanAsStringSelectorNode
+	public class TimeSpanAsStringSelectorNode : UnaryInstructionNode
     {
 		public static TimeSpan StringToTimeSpan(string value)
 		{
@@ -760,10 +1066,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return StringToTimeSpan((string)argument1);
 		}
-    }
-    
-    // TimeSpanAsStringReadAccessorNode
-    public class TimeSpanAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static TimeSpan? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return StringToTimeSpan((string)argument1);
+		}
+	}
+
+	// TimeSpanAsStringReadAccessorNode
+	public class TimeSpanAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -773,10 +1088,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return TimeSpanAsStringSelectorNode.TimeSpanToString(((TimeSpan)argument1));
 		}
-    }
-    
-    // TimeSpanAsStringWriteAccessorNode
-    public class TimeSpanAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(TimeSpan? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return TimeSpanAsStringSelectorNode.TimeSpanToString(((TimeSpan)argument1));
+		}
+	}
+
+	// TimeSpanAsStringWriteAccessorNode
+	public class TimeSpanAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -786,10 +1110,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return TimeSpanAsStringSelectorNode.StringToTimeSpan((string)argument2);
 		}
-    }   
 
-    // TimeAsStringSelectorNode
-    public class TimeAsStringSelectorNode : UnaryInstructionNode
+		public static TimeSpan? InternalExecute(TimeSpan? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return TimeSpanAsStringSelectorNode.StringToTimeSpan((string)argument2);
+		}
+	}
+
+	// TimeAsStringSelectorNode
+	public class TimeAsStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -799,10 +1132,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return new DateTime(DateTime.Parse((string)argument1).TimeOfDay.Ticks);
 		}
-    }
-    
-    // TimeAsStringReadAccessorNode
-    public class TimeAsStringReadAccessorNode : UnaryInstructionNode
+
+		public static DateTime? InternalExecute(string argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return new DateTime(DateTime.Parse((string)argument1).TimeOfDay.Ticks);
+		}
+	}
+
+	// TimeAsStringReadAccessorNode
+	public class TimeAsStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -812,10 +1154,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return ((DateTime)argument1).ToString("T");
 		}
-    }
-    
-    // TimeAsStringWriteAccessorNode
-    public class TimeAsStringWriteAccessorNode : BinaryInstructionNode
+
+		public string InternalExecute(DateTime? argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return ((DateTime)argument1).ToString("T");
+		}
+	}
+
+	// TimeAsStringWriteAccessorNode
+	public class TimeAsStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
@@ -825,19 +1176,38 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return new DateTime(DateTime.Parse((string)argument2).TimeOfDay.Ticks);
 		}
-    }   
 
-    // BinaryAsDisplayStringSelectorNode
-    public class BinaryAsDisplayStringSelectorNode : UnaryInstructionNode
+		public static DateTime? InternalExecute(DateTime? argument1, string argument2)
+		{
+#if NILPROPOGATION
+			if (argument2 == null)
+				return null;
+#endif
+			return new DateTime(DateTime.Parse((string)argument2).TimeOfDay.Ticks);
+		}
+	}
+
+	// BinaryAsDisplayStringSelectorNode
+	public class BinaryAsDisplayStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
 			throw new RuntimeException(RuntimeException.Codes.ReadOnlyRepresentation, "AsString", "System.Binary");
 		}
-    }
-    
-    // BinaryAsDisplayStringReadAccessorNode
-    public class BinaryAsDisplayStringReadAccessorNode : UnaryInstructionNode
+
+		public static string InternalExecute(byte[] argument1)
+		{
+			throw new RuntimeException(RuntimeException.Codes.ReadOnlyRepresentation, "AsString", "System.Binary");
+		}
+
+		public static string InternalExecute(Streams.StreamID argument1)
+		{
+			throw new RuntimeException(RuntimeException.Codes.ReadOnlyRepresentation, "AsString", "System.Binary");
+		}
+	}
+
+	// BinaryAsDisplayStringReadAccessorNode
+	public class BinaryAsDisplayStringReadAccessorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
@@ -847,19 +1217,37 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			#endif
 			return Strings.Get("BinaryAsDisplayStringReadAccessorNode.BinaryData");
 		}
-    }
-    
-    // BinaryAsDisplayStringWriteAccessorNode
-    public class BinaryAsDisplayStringWriteAccessorNode : BinaryInstructionNode
+
+		public static string InternalExecute(byte[] argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Strings.Get("BinaryAsDisplayStringReadAccessorNode.BinaryData");
+		}
+
+		public static string InternalExecute(Streams.StreamID argument1)
+		{
+#if NILPROPOGATION
+			if (argument1 == null)
+				return null;
+#endif
+			return Strings.Get("BinaryAsDisplayStringReadAccessorNode.BinaryData");
+		}
+	}
+
+	// BinaryAsDisplayStringWriteAccessorNode
+	public class BinaryAsDisplayStringWriteAccessorNode : BinaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1, object argument2)
 		{
 			throw new RuntimeException(RuntimeException.Codes.ReadOnlyRepresentation, "AsString", "System.Binary");
 		}
-    }   
+	}
 
-    // GraphicAsDisplayStringSelectorNode
-    public class GraphicAsDisplayStringSelectorNode : UnaryInstructionNode
+	// GraphicAsDisplayStringSelectorNode
+	public class GraphicAsDisplayStringSelectorNode : UnaryInstructionNode
     {
 		public override object InternalExecute(Program program, object argument1)
 		{
