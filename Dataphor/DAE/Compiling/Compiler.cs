@@ -702,7 +702,7 @@ namespace Alphora.Dataphor.DAE.Compiling
                 {
                     if (plan.ShouldEmitIL)
                     {
-                        node.StartEmitIL(plan);
+						node.StartEmitIL(plan, paramsValue);
                         node.EmitIL(plan);
                         node.FinishEmitIL(plan);
                     }

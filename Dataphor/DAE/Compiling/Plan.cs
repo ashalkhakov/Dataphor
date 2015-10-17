@@ -36,6 +36,8 @@ namespace Alphora.Dataphor.DAE.Compiling
 			_symbols = new Symbols(_serverProcess.ServerSession.SessionInfo.DefaultMaxStackDepth, _serverProcess.ServerSession.SessionInfo.DefaultMaxCallDepth);
 			PushSecurityContext(new SecurityContext(_serverProcess.ServerSession.User));
 			PushStatementContext(new StatementContext(StatementType.Select));
+			if (_serverProcess.ServerSession.SessionInfo.ShouldEmitIL)
+				_variables = new VariableContext(_serverProcess.ServerSession.SessionInfo.DefaultMaxStackDepth, _serverProcess.ServerSession.SessionInfo.DefaultMaxCallDepth);
 		}
 		
 		protected override void Dispose(bool disposing)
@@ -508,6 +510,10 @@ namespace Alphora.Dataphor.DAE.Compiling
 
         public ExceptionContext ExceptionContext { get { return _exceptionContexts[_exceptionContexts.Count - 1]; } }
 
+		// Variable context
+		protected VariableContext _variables;
+		public VariableContext VariableContext { get { return _variables; } }
+
 		// Only for use during operator body compilation
 		public System.Reflection.Emit.Label ExitLabel { get; set; }
 
@@ -917,17 +923,11 @@ namespace Alphora.Dataphor.DAE.Compiling
         {
             get
             {
-                if (_dynamicMethod == null)
-                    _dynamicMethod = new System.Reflection.Emit.DynamicMethod(
-                        "dynmth_" + Guid.NewGuid().ToString().Replace("-", "_"),
-                        System.Reflection.MethodAttributes.Public | System.Reflection.MethodAttributes.Static,
-                        System.Reflection.CallingConventions.Standard,
-                        typeof(object),
-                        new Type[] { typeof(Program) },
-                        typeof(Plan).Module,
-                        false
-                        );
-                return _dynamicMethod.GetILGenerator();
+				if (_dynamicMethod == null)
+				{
+					return null;
+				}
+				return _dynamicMethod.GetILGenerator();
             }
         }
         public Func<Program,object> CreateDynamicMethodDelegate()

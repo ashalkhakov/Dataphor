@@ -490,10 +490,45 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         public virtual void EmitIL(Plan plan)
         {
         }
-        public void StartEmitIL(Plan plan)
+        public void StartEmitIL(Plan plan, DataParams paramsValue)
         {
-            // just begin a new anonymous dynamic method
-            var gen = plan.ILGenerator;
+			if (plan.DynamicMethod != null)
+				return;
+
+			// just begin a new anonymous dynamic method
+
+			// Prepare the stack for compilation with the given context
+			var types = new Type[paramsValue != null ? paramsValue.Count + 1 : 1];
+			types[0] = typeof(Program);
+			if (paramsValue != null) {
+				for (var index = 0; index < paramsValue.Count; index++)
+				{
+					var param = paramsValue[index];
+					var nativeType = new ValueNode(param.DataType, null).ILNativeType();
+					if (param.Modifier == Modifier.Out || param.Modifier == Modifier.Var)
+						nativeType = nativeType.MakeByRefType();
+					types[index+1] = nativeType;
+				}
+			}
+
+			var newMethod = new DynamicMethod(
+				"dynmth_" + Guid.NewGuid().ToString().Replace("-", "_"),
+				System.Reflection.MethodAttributes.Public | System.Reflection.MethodAttributes.Static,
+				System.Reflection.CallingConventions.Standard,
+				typeof(object),
+				types,
+				typeof(Plan).Module,
+				false
+				);
+
+			plan.VariableContext.Program = new ParameterBuilderInfo(0, typeof(Program));
+			if (paramsValue != null)
+				for (var index = 0; index < paramsValue.Count; index++)
+				{
+					plan.VariableContext.Push(new ParameterBuilderInfo((short)(index + 1), types[index + 1]));
+				}
+
+			plan.DynamicMethod = newMethod;
         }
         private Func<Program, object> _ilMethod;
         public Func<Program,object> ILMethod

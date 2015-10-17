@@ -625,13 +625,30 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 throw new CompilerException(CompilerException.Codes.CompilerMessage, "Compiling non-interpreted operators unsupported!");
 
             var saveDynamicMethod = plan.DynamicMethod;
+			var saveProgram = plan.VariableContext.Program;
+			var saveErrorVar = plan.VariableContext.ErrorVar;
             plan.Symbols.PushWindow(0);
+			plan.VariableContext.PushWindow(0);
             try
             {
-                var argTypes = new Type[] { typeof(Program) };
+				// reserve an extra operand for the Program argument
+				Schema.Operand operand;
+				var argTypes = new Type[operatorValue.Operands.Count+1];
                 Type retType = null;
 
-                if (operatorValue.ReturnDataType != null)
+				argTypes[0] = typeof(Program);
+				for (var index = 0; index < operatorValue.Operands.Count; index++)
+				{
+					operand = operatorValue.Operands[index];
+                    var tp = operand.DataType;
+					var nativeType = new ValueNode(tp, null).ILNativeType();
+					if (operand.Modifier == Modifier.Out || operand.Modifier == Modifier.Var)
+						nativeType = nativeType.MakeByRefType();
+
+					argTypes[index + 1] = nativeType;
+				}
+
+				if (operatorValue.ReturnDataType != null)
                 {
                     var tmp = new ValueNode(operatorValue.ReturnDataType, null);
                     retType = tmp.ILNativeType();
@@ -642,38 +659,29 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 }
                 plan.DynamicMethod = new DynamicMethod(operatorValue.OperatorName, retType, argTypes);
 
-                Schema.Operand operand;
+				plan.VariableContext.Program = new ParameterBuilderInfo(0, typeof(Program));
                 for (int index = 0; index < operatorValue.Operands.Count; index++)
                 {
                     operand = operatorValue.Operands[index];
                     plan.Symbols.Push(new Symbol(operand.Name, operand.DataType, operand.Modifier == Modifier.Const));
+					var param = new ParameterBuilderInfo((short)(index+1), argTypes[index+1]);
+                    plan.VariableContext.Push(param);
                 }
 
                 VariableNode allocateResultNode = null;
                 if (operatorValue.ReturnDataType != null)
                 {
                     plan.Symbols.Push(new Symbol(Keywords.Result, operatorValue.ReturnDataType));
-                    allocateResultNode = new VariableNode(Keywords.Result, operatorValue.ReturnDataType);
-                }
+					allocateResultNode = new VariableNode(Keywords.Result, operatorValue.ReturnDataType);
+				}
 
-                //
-                // Prepare the result
-                var stack = plan.ILGenerator.DeclareLocal(typeof(Stack));
-                var stackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
-
+				// Prepare the result
+				int stackDepth = 0;
                 if (allocateResultNode != null)
                 {
+					// NOTE: this will declare the local!
                     allocateResultNode.EmitIL(plan);
-
-                    // Record the stack depth
-                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                    plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                    plan.ILGenerator.Emit(OpCodes.Stloc, stack);
-
-                    // int stackDepth = program.Stack.Count;
-                    plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                    plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
-                    plan.ILGenerator.Emit(OpCodes.Stloc, stackDepth);
+					stackDepth = plan.VariableContext.Count;
                 }
 				//
 
@@ -701,30 +709,10 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                     // Return the result
                     if (allocateResultNode != null)
                     {
-                        var newStackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
+						var newStackDepth = plan.VariableContext.Count;
+						var resultLocal = (LocalBuilder)plan.VariableContext.Peek(newStackDepth - stackDepth);
 
-                        plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
-                        plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
-
-                        plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
-                        plan.ILGenerator.Emit(OpCodes.Ldloc, stackDepth);
-                        plan.ILGenerator.Emit(OpCodes.Sub);
-                        plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
-
-                        plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                        plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
-                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Peek"));
-
-                        // unbox
-                        if (retType.IsValueType)
-                        {
-                            var hostType = retType.GetGenericArguments()[0];
-
-                            plan.ILGenerator.Emit(OpCodes.Call, typeof(StackReferenceNode).GetMethod("UnboxNullableObject").MakeGenericMethod(hostType));
-                        }
-                        else
-                            plan.ILGenerator.Emit(OpCodes.Castclass, retType);
+						plan.ILGenerator.Emit(OpCodes.Ldloc, resultLocal);
                     }
                 }
                 plan.ILGenerator.Emit(OpCodes.Ret);
@@ -733,7 +721,10 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             }
             finally
             {
+				plan.VariableContext.Program = saveProgram;
+				plan.VariableContext.ErrorVar = saveErrorVar;
                 plan.DynamicMethod = saveDynamicMethod;
+				plan.VariableContext.PopWindow();
                 plan.Symbols.PopWindow();
             }
 

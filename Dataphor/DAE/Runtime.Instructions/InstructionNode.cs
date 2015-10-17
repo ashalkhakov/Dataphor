@@ -237,7 +237,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                     throw new CompilerException(CompilerException.Codes.CompilerMessage, "unable to find a suitable static InternalExecuteMethod");
 
                 // push the Program argument on stack
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
             }
 
             for (int i = 0; i < NodeCount; i++)

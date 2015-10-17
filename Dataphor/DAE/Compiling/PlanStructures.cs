@@ -111,4 +111,45 @@ namespace Alphora.Dataphor.DAE.Compiling
     }
 
     public class ExceptionContexts : List<ExceptionContext> { }
+
+	// Variable context
+	public class ParameterBuilderInfo
+	{
+		// NOTE: DynamicMethod.DefineParameter always returns a null
+		public ParameterBuilderInfo(short id, Type nativeType)
+		{
+			ID = id;
+			NativeType = nativeType;
+		}
+		public short ID { get; set; }
+		public Type NativeType { get; set;  }
+	}
+
+	// NOTE: either LocalBuilder or ParameterBuilderInfo is pushed onto this stack!
+	public class VariableContext : Stack<object>
+	{
+		public VariableContext() : base() {
+			// Push an empty window onto the stack
+			PushWindow(0);
+		}
+		public VariableContext(int maxStackDepth, int maxCallDepth) : base(maxStackDepth, maxCallDepth) {
+			// Push an empty window onto the stack
+			PushWindow(0);
+		}
+
+		ParameterBuilderInfo _program;
+		// NOTE: since D4 is first-order, there shouldn't be much issue with keeping at most one
+		// Program argument
+		public ParameterBuilderInfo Program {
+			get { return _program; }
+			set { _program = value; }
+		}
+
+		System.Reflection.Emit.LocalBuilder _errorVar;
+		public System.Reflection.Emit.LocalBuilder ErrorVar
+		{
+			get { return _errorVar; }
+			set { _errorVar = value; }
+		}
+	}
 }

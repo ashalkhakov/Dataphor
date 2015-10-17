@@ -155,24 +155,15 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
         public override void EmitIL(Plan plan)
         {
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("PushFrame", Type.EmptyTypes));
-
-			var Le = plan.ILGenerator.BeginExceptionBlock();
-            plan.PushExceptionContext(new ExceptionContext(Le));
-			try {
+			plan.VariableContext.PushFrame();
+			try
+			{
 				Nodes[0].EmitIL(plan);
 			}
 			finally
 			{
-				plan.PopExceptionContext();
+				plan.VariableContext.PopFrame();
 			}
-			plan.ILGenerator.BeginFinallyBlock();
-			plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("PopFrame"));
-            plan.ILGenerator.EndExceptionBlock();
         }
 
         public override Type ILNativeType()
@@ -207,27 +198,32 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
         public override void EmitIL(Plan plan)
         {
-            Nodes[0].EmitIL(plan);
-            var retType = Nodes[0].ILNativeType();
+			var retType = Nodes[0].ILNativeType();
 
             if (retType == typeof(void))
             {
-                // nothing to dispose of
-            }
-            else
+				// nothing to dispose of
+				Nodes[0].EmitIL(plan);
+			}
+			else
             {
-                if (retType.IsValueType)
+				plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
+				plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("ValueManager").GetGetMethod());
+
+				Nodes[0].EmitIL(plan);
+
+				if (retType.IsValueType)
                 {
-                    var hostType = retType.GetGenericArguments()[0];
+					var hostType = retType.GetGenericArguments()[0];
 
-                    plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
-                }
-                else
-                    plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
+					plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
+				}
+				else
+					plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
 
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("DisposeValue"));
-            }
-        }
+				plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("DisposeValue"));
+			}
+		}
 
         public override Type ILNativeType()
         {
@@ -731,30 +727,30 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			throw (Exception)program.Stack.ErrorVar;
 		}
 
-        public static void InternalThrow(Program program)
+        public static void InternalThrow(Program program, object errorVar)
         {
-            if (program.Stack.ErrorVar == null)
+            if (errorVar == null)
                 throw new RuntimeException(RuntimeException.Codes.NilEncountered);
             program.ReportThrow();
-            throw (Exception)program.Stack.ErrorVar;
+            throw (Exception)errorVar;
         }
 
         public override void EmitIL(Plan plan)
         {
-            if (NodeCount > 0)
-            {
-                var tempValue = plan.ILGenerator.DeclareLocal(typeof(Exception));
+			var tempValue = plan.ILGenerator.DeclareLocal(typeof(Exception));
+			if (NodeCount > 0)
+			{
+				Nodes[0].EmitIL(plan);
+				plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
+			}
+			else
+			{
+				plan.ILGenerator.Emit(OpCodes.Ldnull);
+			}
+			plan.ILGenerator.Emit(OpCodes.Stloc, tempValue);
 
-                Nodes[0].EmitIL(plan);
-                plan.ILGenerator.Emit(OpCodes.Stloc, tempValue);
-
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("ErrorVar").GetSetMethod());
-            }
-
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+			plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
+			plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
             plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("InternalThrow", BindingFlags.Static | BindingFlags.Public));
         }
 
@@ -888,34 +884,9 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
         public override void EmitIL(Plan plan)
         {
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("PushFrame", Type.EmptyTypes));
-
-            var Le = plan.ILGenerator.BeginExceptionBlock();
-            plan.PushExceptionContext(new ExceptionContext(Le));
-
-            try {
-                if (_variableName != String.Empty)
-                {
-                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                    plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("InternalWork", BindingFlags.Public | BindingFlags.Static));
-                }
-
-                Nodes[0].EmitIL(plan);
-
-                plan.ILGenerator.BeginFinallyBlock();
-
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("PopFrame"));
-
-                plan.ILGenerator.EndExceptionBlock();
-            }
-            finally
-            {
-                plan.PopExceptionContext();
-            }
+			if (_variableName != String.Empty)
+				plan.VariableContext.Push(plan.VariableContext.ErrorVar);
+			Nodes[0].EmitIL(plan);
         }
 
         public override Statement EmitStatement(EmitMode mode)
@@ -997,52 +968,28 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             try {
                 Nodes[0].EmitIL(plan);
 
-                plan.ILGenerator.BeginCatchBlock(typeof(Exception));
-                plan.ILGenerator.Emit(OpCodes.Stloc, exception);
+				plan.ILGenerator.BeginCatchBlock(typeof(Exception));
+				var local = plan.ILGenerator.DeclareLocal(typeof(Exception));
+				plan.VariableContext.ErrorVar = local;
+				plan.ILGenerator.Emit(OpCodes.Stloc, local);
 
-                var L0 = plan.ILGenerator.DefineLabel();
-
-                // if this is a host exception, set the error variable
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("ErrorVar").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldnull);
-                plan.ILGenerator.Emit(OpCodes.Ceq);
-                plan.ILGenerator.Emit(OpCodes.Brfalse, L0);
-
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldloc, exception);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("ErrorVar").GetSetMethod());
-
-                plan.ILGenerator.MarkLabel(L0);
-
-                ErrorHandlerNode node;
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("ErrorVar").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Stloc, exception);
+				ErrorHandlerNode node;
 
                 for (int index = 1; index < NodeCount; index++)
                 {
                     node = GetErrorHandlerNode(Nodes[index]);
                     if (plan.Catalog.DataTypes.SystemError.Is(node.ErrorType)) // TODO: No RTTI on the error
                     {
-                        node.EmitIL(plan);
+						node.EmitIL(plan);
+						plan.VariableContext.ErrorVar = null;
                         break;
                     }
                 }
-
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldnull);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("ErrorVar").GetSetMethod());
-
-                plan.ILGenerator.EndExceptionBlock();
             }
             finally
             {
-                plan.PopExceptionContext();
+				plan.ILGenerator.EndExceptionBlock();
+				plan.PopExceptionContext();
             }
         }
 
@@ -1885,7 +1832,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                         throw new CompilerException(CompilerException.Codes.CompilerMessage, "Calling interpreted operators unsupported!");
 
                     // push the Program argument on stack
-                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                    plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
                 }
 
                 for (int i = 0; i < NodeCount; i++)
@@ -1895,46 +1842,9 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
                 return;
             }
 
-            var objectValue = plan.ILGenerator.DeclareLocal(typeof(object));
-
-            for (var index = 0; index < Operator.Operands.Count; index++)
-            {
-                // FIXME: basically assignment node code!
-                var retType = Nodes[index].ILNativeType();
-                var tempValue = plan.ILGenerator.DeclareLocal(retType);
-
-                Nodes[index].EmitIL(plan);
-
-                if (retType.IsValueType)
-                {
-                    var hostType = retType.GetGenericArguments()[0];
-
-                    plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
-
-                    // finally, validate
-                    /*
-                    // FIXME: can't validate because there is no way to load an arbitrary object (ScalarType)
-                    // to stack...
-                    plan.ILGenerator.Emit(OpCodes.Call, typeof(ValueUtility).GetMethod("ValidateValue", new Type[] { typeof(Program), typeof(Schema.ScalarType), typeof(object) }));
-                    */
-                }
-                else
-                {
-                    plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
-                }
-
-                plan.ILGenerator.Emit(OpCodes.Stloc, objectValue);
-
-                // package up and push to interpreter stack
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldloc, objectValue);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Push"));
-            }
-
             var saveIsInsert = plan.ILGenerator.DeclareLocal(typeof(bool));
 
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+            plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
             plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock0", BindingFlags.Static | BindingFlags.Public));
             plan.ILGenerator.Emit(OpCodes.Stloc, saveIsInsert);
 
@@ -1952,7 +1862,7 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
                 if (!Operator.ShouldTranslate)
                 {
-                    plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                    plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
                     plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock1", BindingFlags.Static | BindingFlags.Public));
                     plan.ILGenerator.Emit(OpCodes.Stloc, transaction);
                 }
@@ -1969,65 +1879,24 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
                     plan.ILGenerator.BeginExceptionBlock();
                     {
-                        // Prepare the result
-//                        if (_allocateResultNode != null)
-//                            _allocateResultNode.EmitIL(plan);
+						// NOTE: in the interpreter, the results are evaluated outside the exception blocks...
+						// is this correct?
 
-                        // Record the stack depth
-//                        var stack = plan.ILGenerator.DeclareLocal(typeof(Stack));
+						// push the Program argument on stack
+						plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
 
-//                        plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-//                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-//                        plan.ILGenerator.Emit(OpCodes.Stloc, stack);
+						for (var index = 0; index < Operator.Operands.Count; index++)
+						{
+							// evaluate arguments
+							// TODO: save to locals?
+							Nodes[index].EmitIL(plan);
+						}
 
-//                        var stackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
-
-                        // int stackDepth = program.Stack.Count;
-//                        plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-//                        plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
-//                        plan.ILGenerator.Emit(OpCodes.Stloc, stackDepth);
-
-                        plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                        plan.ILGenerator.Emit(OpCodes.Call, Operator.Block.CompiledBlockNode);
-
-                        // TODO: Pass any var arguments back out to the instruction
-//                        for (int index = 0; index < Operator.Operands.Count; index++)
-//                            if (Operator.Operands[index].Modifier == Modifier.Var)
-//                                arguments[index] = program.Stack[program.Stack.Count - stackDepth + (Operator.Operands.Count + (_allocateResultNode != null ? 1 : 0) - 1 - index)];
+						plan.ILGenerator.Emit(OpCodes.Call, Operator.Block.CompiledBlockNode);
 
                         // Return the result
                         if (_allocateResultNode != null)
-                        {
-                            /*
-                            var retType = ((VariableNode)_allocateResultNode).VariableNativeType();
-                            var newStackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
-
-                            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
-                            plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
-
-                            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                            plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
-                            plan.ILGenerator.Emit(OpCodes.Ldloc, stackDepth);
-                            plan.ILGenerator.Emit(OpCodes.Sub);
-                            plan.ILGenerator.Emit(OpCodes.Stloc, newStackDepth);
-
-                            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                            plan.ILGenerator.Emit(OpCodes.Ldloc, newStackDepth);
-                            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Peek"));
-
-                            // unbox
-                            if (retType.IsValueType)
-                            {
-                                var hostType = retType.GetGenericArguments()[0];
-
-                                plan.ILGenerator.Emit(OpCodes.Call, typeof(StackReferenceNode).GetMethod("UnboxNullableObject").MakeGenericMethod(hostType));
-                            }
-                            else
-                                plan.ILGenerator.Emit(OpCodes.Castclass, retType);*/
-
                             plan.ILGenerator.Emit(OpCodes.Stloc, resultLocal);
-                        }
                     }
                     plan.ILGenerator.BeginFinallyBlock();
                     {
@@ -2045,16 +1914,14 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
             }
             plan.ILGenerator.BeginFinallyBlock();
             {
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
+                plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
                 plan.ILGenerator.Emit(OpCodes.Ldloc, saveIsInsert);
                 plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("CodeBlock0_Undo", BindingFlags.Static | BindingFlags.Public));
             }
             plan.ILGenerator.EndExceptionBlock();
 
             if (_allocateResultNode != null)
-            {
                 plan.ILGenerator.Emit(OpCodes.Ldloc, resultLocal);
-            }
         }
 
         public override Type ILNativeType()
@@ -2167,52 +2034,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         public override void EmitIL(Plan plan)
         {
             var retType = VariableNativeType();
-            var stackDepth = plan.ILGenerator.DeclareLocal(typeof(int));
-            var stack = plan.ILGenerator.DeclareLocal(typeof(Stack));
+			var local = plan.ILGenerator.DeclareLocal(retType);
 
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Stloc, stack);
+			plan.VariableContext.Push(local);
 
-            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-            plan.ILGenerator.Emit(OpCodes.Ldnull);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Push"));
-
-            plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Stloc, stackDepth);
-
-            if (NodeCount > 0)
+			if (NodeCount > 0)
             {
-                var tempValue = plan.ILGenerator.DeclareLocal(retType);
-                var diffValue = plan.ILGenerator.DeclareLocal(typeof(int));
-
                 Nodes[0].EmitIL(plan);
-                plan.ILGenerator.Emit(OpCodes.Stloc, tempValue);
+                plan.ILGenerator.Emit(OpCodes.Stloc, local);
 
                 // FIXME: can't validate!
-                //                if (Nodes[0].DataType is Schema.ScalarType)
-                //                    tempValue = ValueUtility.ValidateValue(program, (Schema.ScalarType)Nodes[0].DataType, tempValue);
-
-                plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetProperty("Count").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldloc, stackDepth);
-                plan.ILGenerator.Emit(OpCodes.Sub);
-                plan.ILGenerator.Emit(OpCodes.Stloc, diffValue);
-
-                plan.ILGenerator.Emit(OpCodes.Ldloc, stack);
-                plan.ILGenerator.Emit(OpCodes.Ldloc, diffValue);
-                plan.ILGenerator.Emit(OpCodes.Ldloc, tempValue);
-                if (retType.IsValueType)
-                {
-                    var hostType = retType.GetGenericArguments()[0];
-
-                    plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
-                }
-                else
-                    plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
-
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Poke"));
+//                if (Nodes[0].DataType is Schema.ScalarType)
+//                    tempValue = ValueUtility.ValidateValue(program, (Schema.ScalarType)Nodes[0].DataType, tempValue);
             }
             else
             {
@@ -2220,9 +2053,9 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 //                if (_hasDefault && (VariableType is Schema.ScalarType))
 //                    program.Stack.Poke(0, ValueUtility.DefaultValue(program, (Schema.ScalarType)VariableType));
             }
-        }
+		}
 
-        public override Type ILNativeType()
+		public override Type ILNativeType()
         {
             return typeof(void);
         }
@@ -2292,6 +2125,11 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 			program.Stack.Pop();
 			return null;
 		}
+
+		public override void EmitIL(Plan plan)
+		{
+			plan.VariableContext.Pop();
+		}
 	}
 	
 	public class DeallocateVariableNode : PlanNode
@@ -2315,16 +2153,32 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
 
         public override void EmitIL(Plan plan)
         {
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("ValueManager").GetGetMethod());
+			var localOrArg = plan.VariableContext.Peek(Location);
+			Type retType = null;
+			if (localOrArg is LocalBuilder)
+				retType = ((LocalBuilder)localOrArg).LocalType;
+			else
+				retType = ((ParameterBuilderInfo)localOrArg).NativeType;
 
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Ldc_I4, Location);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Peek"));
+			plan.ILGenerator.Emit(OpCodes.Ldarg, plan.VariableContext.Program.ID);
+			plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("ValueManager").GetGetMethod());
 
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("DisposeValue"));
-        }
+			if (localOrArg is LocalBuilder)
+				plan.ILGenerator.Emit(OpCodes.Ldloc, (LocalBuilder)localOrArg);
+			else
+				plan.ILGenerator.Emit(OpCodes.Ldarg, ((ParameterBuilderInfo)localOrArg).ID);
+			if (retType.IsValueType)
+			{
+				var hostType = retType.GetGenericArguments()[0];
+
+				plan.ILGenerator.Emit(OpCodes.Call, typeof(AssignmentNode).GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
+			}
+			else
+			{
+				plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
+			}
+			plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("DisposeValue"));
+		}
 
         public override Type ILNativeType()
         {
@@ -2408,36 +2262,19 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         public override void EmitIL(Plan plan)
         {
             var retType = Nodes[1].ILNativeType();
-            var tempValue = plan.ILGenerator.DeclareLocal(retType);
-            var objectValue = plan.ILGenerator.DeclareLocal(typeof(object));
 
             Nodes[1].EmitIL(plan);
 
-            if (retType.IsValueType)
-            {
-                var hostType = retType.GetGenericArguments()[0];
-
-                plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("BoxNullableObject").MakeGenericMethod(hostType));
-
-                // finally, validate
-                /*
-                // FIXME: can't validate because there is no way to load an arbitrary object (ScalarType)
-                // to stack...
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(ValueUtility).GetMethod("ValidateValue", new Type[] { typeof(Program), typeof(Schema.ScalarType), typeof(object) }));
-                */
-            }
-            else
-            {
-                plan.ILGenerator.Emit(OpCodes.Castclass, typeof(object));
-            }
-
-            plan.ILGenerator.Emit(OpCodes.Stloc, objectValue);
-
-            plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-            plan.ILGenerator.Emit(OpCodes.Ldc_I4, ((StackReferenceNode)Nodes[0]).Location);
-            plan.ILGenerator.Emit(OpCodes.Ldloc, objectValue);
-            plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Poke"));
+			var local = plan.VariableContext.Peek(((StackReferenceNode)Nodes[0]).Location);
+			// TODO: validate before assigning!
+			if (local is LocalBuilder)
+			{
+				plan.ILGenerator.Emit(OpCodes.Stloc, ((LocalBuilder)local));
+			}
+			else
+			{
+				plan.ILGenerator.Emit(OpCodes.Starg, ((ParameterBuilderInfo)local).ID);
+			}
         }
 
         public override Type ILNativeType()
@@ -2941,31 +2778,18 @@ namespace Alphora.Dataphor.DAE.Runtime.Instructions
         {
             var retType = ILNativeType();
 
-            // it probably means something entirely different to what I have in mind?
-            // is it for call-by-reference function arguments?
-//            if (ByReference)
-//            {
-//                throw new CompilerException(CompilerException.Codes.CompilerMessage, "By-ref parameters unsupported");
-//            }
-//            else
-            {
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("ValueManager").GetGetMethod());
-
-                plan.ILGenerator.Emit(OpCodes.Ldarg_0);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Program).GetProperty("Stack").GetGetMethod());
-                plan.ILGenerator.Emit(OpCodes.Ldc_I4, Location);
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(Stack).GetMethod("Peek"));
-
-                plan.ILGenerator.Emit(OpCodes.Call, typeof(DataValue).GetMethod("CopyValue"));
-                if (retType.IsValueType)
-                {
-                    var hostType = retType.GetGenericArguments()[0];
-
-                    plan.ILGenerator.Emit(OpCodes.Call, GetType().GetMethod("UnboxNullableObject").MakeGenericMethod(hostType));
-                }
-                else
-                    plan.ILGenerator.Emit(OpCodes.Castclass, retType);
+			// TODO: copy value if not ByReference
+			var localOrArgument = plan.VariableContext.Peek(Location);
+			if (localOrArgument is ParameterBuilderInfo)
+			{
+				// if ByReference, use ldind
+				// otherwise:
+				plan.ILGenerator.Emit(OpCodes.Ldarg, (((ParameterBuilderInfo)localOrArgument).ID));
+			}
+			else
+			{
+				// ignore ByReference!
+				plan.ILGenerator.Emit(OpCodes.Ldloc, (LocalBuilder)localOrArgument);
             }
         }
 
